@@ -1,0 +1,679 @@
+var
+  iBox:tbox;
+
+function GetInvBox(InvNum:integer): TBox;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetMenuBox('Inv');
+  case InvNum of
+    1: Result := ToBox((TempBox.X1-63), (TempBox.Y2+10), (TempBox.X1-32), (TempBox.Y2+41));
+    2: Result := ToBox((TempBox.X1-21), (TempBox.Y2+10), (TempBox.X1+10), (TempBox.Y2+41));
+    3: Result := ToBox((TempBox.X1+21), (TempBox.Y2+10), (TempBox.X1+52), (TempBox.Y2+41));
+    4: Result := ToBox((TempBox.X1+63), (TempBox.Y2+10), (TempBox.X1+94), (TempBox.Y2+41));
+
+    5: Result := ToBox((TempBox.X1-63), (TempBox.Y2+46), (TempBox.X1-32), (TempBox.Y2+77));
+    6: Result := ToBox((TempBox.X1-21), (TempBox.Y2+46), (TempBox.X1+10), (TempBox.Y2+77));
+    7: Result := ToBox((TempBox.X1+21), (TempBox.Y2+46), (TempBox.X1+52), (TempBox.Y2+77));
+    8: Result := ToBox((TempBox.X1+63), (TempBox.Y2+46), (TempBox.X1+94), (TempBox.Y2+77));
+
+    9: Result := ToBox((TempBox.X1-63), (TempBox.Y2+82), (TempBox.X1-32), (TempBox.Y2+113));
+    10:Result := ToBox((TempBox.X1-21), (TempBox.Y2+82), (TempBox.X1+10), (TempBox.Y2+113));
+    11:Result := ToBox((TempBox.X1+21), (TempBox.Y2+82), (TempBox.X1+52), (TempBox.Y2+113));
+    12:Result := ToBox((TempBox.X1+63), (TempBox.Y2+82), (TempBox.X1+94), (TempBox.Y2+113));
+
+    13:Result := ToBox((TempBox.X1-63), (TempBox.Y2+118), (TempBox.X1-32), (TempBox.Y2+149));
+    14:Result := ToBox((TempBox.X1-21), (TempBox.Y2+118), (TempBox.X1+10), (TempBox.Y2+149));
+    15:Result := ToBox((TempBox.X1+21), (TempBox.Y2+118), (TempBox.X1+52), (TempBox.Y2+149));
+    16:Result := ToBox((TempBox.X1+63), (TempBox.Y2+118), (TempBox.X1+94), (TempBox.Y2+149));
+
+    17:Result := ToBox((TempBox.X1-63), (TempBox.Y2+154), (TempBox.X1-32), (TempBox.Y2+185));
+    18:Result := ToBox((TempBox.X1-21), (TempBox.Y2+154), (TempBox.X1+10), (TempBox.Y2+185));
+    19:Result := ToBox((TempBox.X1+21), (TempBox.Y2+154), (TempBox.X1+52), (TempBox.Y2+185));
+    20:Result := ToBox((TempBox.X1+63), (TempBox.Y2+154), (TempBox.X1+94), (TempBox.Y2+185));
+
+    21:Result := ToBox((TempBox.X1-63), (TempBox.Y2+190), (TempBox.X1-32), (TempBox.Y2+221));
+    22:Result := ToBox((TempBox.X1-21), (TempBox.Y2+190), (TempBox.X1+10), (TempBox.Y2+221));
+    23:Result := ToBox((TempBox.X1+21), (TempBox.Y2+190), (TempBox.X1+52), (TempBox.Y2+221));
+    24:Result := ToBox((TempBox.X1+63), (TempBox.Y2+190), (TempBox.X1+94), (TempBox.Y2+221));
+
+    25:Result := ToBox((TempBox.X1-63), (TempBox.Y2+226), (TempBox.X1-32), (TempBox.Y2+257));
+    26:Result := ToBox((TempBox.X1-21), (TempBox.Y2+226), (TempBox.X1+10), (TempBox.Y2+257));
+    27:Result := ToBox((TempBox.X1+21), (TempBox.Y2+226), (TempBox.X1+52), (TempBox.Y2+257));
+    28:Result := ToBox((TempBox.X1+63), (TempBox.Y2+226), (TempBox.X1+94), (TempBox.Y2+257));
+  end;
+end;
+
+function GetInventoryDimensions: Tbox;
+begin
+  if (iBox.X1 < 1) then
+    result := ToBox(GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2)
+  else
+    result := iBox;
+end;
+
+function itemInSlotEx(I: Integer): Boolean;
+var
+  X, Y: Integer;
+  TB: TBox;
+begin
+  if not inRange(I, 1, 28) then
+    Exit;
+  result := findColor(x, y, clOutline_black, GetInvBox(i).x1, GetInvBox(i).y1, GetInvBox(i).x2, GetInvBox(i).y2);
+end;
+
+function itemInSlot(I: Integer): Boolean;
+var
+  X, Y: Integer;
+  TB: TBox;
+begin
+  if not inRange(I, 1, 28) then
+    Exit;
+  result := findColor(x, y, clOutline_black, GetInvBox(i).x1, GetInvBox(i).y1, GetInvBox(i).x2, GetInvBox(i).y2);
+end;
+
+function interactSlotEx(Slot: Integer; action: Variant; miss: Boolean=False): Boolean;
+begin
+  result := false;
+  if (not itemInSlotEx(Slot)) then
+    if not variantIsInteger(action) then
+      exit;
+
+  if (not mouseInBox(GetInvBox(Slot))) then
+    if miss then
+      MissMouse(RandPointInBox(GetInvBox(slot)), 0, 0)
+    else
+      HumanMMouse(RandPointInBox(GetInvBox(slot)), 0, 0);
+
+  if variantIsInteger(action) then
+  begin
+    if (action = MOUSE_MOVE) then
+      exit(true);
+    if action = MOUSE_LEFT then
+    begin
+      fastClick(MOUSE_LEFT);
+      exit(true);
+    end;
+  end;
+
+  fastClick(MOUSE_RIGHT);
+  if variantIsString(action) then
+    result := waitOption(action, 200)
+  else
+    result := true;
+end;
+
+function interactSlotEx(Slot: integer; action: Variant; Dist:integer): boolean; overload;
+var
+  PosDist, x, y:integer;
+  RPoint:TPoint;
+begin
+  result := false;
+  if (not itemInSlotEx(Slot)) then
+    if not variantIsInteger(action) then
+      exit;
+
+  if (not mouseInBox(GetInvBox(Slot))) then
+  begin
+    rpoint := RandPointInBox(GetInvBox(Slot));
+    getMousepos(x, y);
+    PosDist := distance(x, y, rpoint.x, rpoint.y);
+    if (PosDist > Dist) then
+      MissMouse(rpoint, 0, 0)
+    else
+      HumanMMouse(rpoint, 0, 0);
+  end;
+
+  if variantIsInteger(action) then
+  begin
+    if (action = MOUSE_MOVE) then
+      exit(true);
+    if action = MOUSE_LEFT then
+    begin
+      fastClick(MOUSE_LEFT);
+      exit(true);
+    end;
+  end;
+
+  fastClick(MOUSE_RIGHT);
+  if variantIsString(action) then
+    result := waitOption(action, 200)
+  else
+    result := true;
+end;
+
+
+
+function GetInvItemAmount(Slot:integer):integer;
+var
+  TempBox:TBox;
+  i:integer;
+  Col:TIntegerArray;
+  TPA: TPointArray;
+  S:String;
+  aCol:TColEx;
+begin
+  if ((Slot > 28) or (Slot < 1)) then
+    exit;
+  if not ItemInSlotEx(slot) then
+    exit;
+  TempBox:= GetInvBox(Slot);
+  Col  := [65535, 65278, 16777215, 8453888];
+  for i:=0 to High(Col) do
+  begin
+    aCol.create(Col[i], 0);
+    if aCol.findAllIn(TempBox, TPA) then
+    begin
+       S := getTextAtEx(TempBox.X1, TempBox.Y1, TempBox.X2, TempBox.Y2, 0, 1, 1, Col[i], 0, 'StatChars07');
+       Result := strToIntDef(GetNumbers(S), 1);
+       Case I of
+        2: Result := Result * 1000;
+        3: Result := Result * 1000000;
+       end;
+       Exit;
+    end;
+  end;
+  if ItemInSlotEx(Slot) then
+    Result := 1;
+end;
+
+function getInvCountEx(): Integer;
+var
+  i: Integer;
+begin
+  Result := 0;
+  for i := 1 to 28 do
+    if (itemInSlotEx(I)) then
+     inc(Result);
+end;
+
+{function DItem.findIn(Area: TBox; var fPnt: TPoint): Boolean;
+var
+  x,y : Integer;
+begin
+  result := False;
+  try
+    if DTMExists(self.DTM) then
+      result := findDTM(self.DTM, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2);
+    if not result then
+      if bitmapExists(self.BMP) then
+        result := findBitmapToleranceIn(self.BMP, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2, self.BMP_TOL);
+  except
+    writeln('Item DTM/BMP does not exist!');
+    exit(false);
+  end;
+  fPnt := point(x, y);
+end;}
+
+function DItem.findIn(Area: TBox; var fPnt: TPoint): Boolean;
+var
+  x,y, ExCount : Integer;
+begin
+  result := False;
+  if DTMExists(self.DTM) then
+    result := findDTM(self.DTM, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2)
+  else
+    inc(ExCount);
+  if not result then
+    if bitmapExists(self.BMP) then
+      result := findBitmapToleranceIn(self.BMP, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2, self.BMP_TOL)
+    else
+      inc(ExCount);
+  if (ExCount = 2) then
+  begin
+    writeln('Item DTM/BMP does not exist!');
+    exit(false);
+  end;
+  if not result then
+    exit(false);
+  fPnt := point(x, y);
+end;
+
+{function DItem.findIn(Area: TBox): Boolean; Overload;
+var
+  x,y : Integer;
+begin
+  result := False;
+  try
+    if DTMExists(self.DTM) then
+      result := findDTM(self.DTM, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2);
+    if not result then
+      if bitmapExists(self.BMP) then
+        result := findBitmapToleranceIn(self.BMP, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2, self.BMP_TOL);
+  except
+    writeln('Item DTM/BMP does not exist!');
+    exit(false);
+  end;
+end;   }
+
+function DItem.findIn(Area: TBox): Boolean; Overload;
+var
+  x,y, ExCount: Integer;
+begin
+  result := False;
+  if DTMExists(self.DTM) then
+    result := findDTM(self.DTM, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2)
+  else
+    inc(ExCount);
+  if not result then
+    if bitmapExists(self.BMP) then
+      result := findBitmapToleranceIn(self.BMP, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2, self.BMP_TOL)
+    else
+      inc(ExCount);
+  if (ExCount = 2) then
+  begin
+    writeln('Item DTM/BMP does not exist!');
+    exit(false);
+  end;
+  if not result then
+    exit(false);
+end;
+
+function DItem.inEquipment(): Boolean;
+var
+  x,y : Integer;
+begin
+  result := False;
+  ChangeTab('Equip');
+  if DTMExists(self.DTM) then
+    result := findDTM(self.DTM, x, y, GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2);
+  if not result then
+    if bitmapExists(self.BMP) then
+      result := findBitmapToleranceIn(self.BMP, x, y, GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2, self.BMP_TOL);
+end;
+
+function DItem.inInventory(): Boolean;
+var
+  Pnt : TPoint;
+begin
+  result := Self.findIn(ToBox(GetInvBox(1).X1, GetInvBox(1).y1, GetInvBox(28).x2, GetInvBox(28).y2), Pnt);
+end;
+
+function DItem.getAmount: Integer;
+var
+  i,c : Integer;
+  pnt : TPoint;
+begin
+  result := 0;
+  for i := 1 to 28 do
+    if itemInSlotEx(i) then
+      if Self.findIn(GetInvBox(i), pnt) then
+      begin
+        c := GetInvItemAmount(i);
+        if (c > 1) then
+          exit(c);
+        inc(Result);
+      end;
+end;
+
+function DItem.getSlots(): TIntegerArray;
+var
+  i   : Integer;
+  pnt : TPoint;
+begin
+  for i:=1 to 28 do
+    if itemInSlotEx(i) then
+      if Self.findIn(GetInvBox(i), pnt) then
+      begin
+        setArrayLength(result, Length(result)+1);
+        result[High(result)] := i;
+      end;
+end;
+
+function DItem.getSlot(): Integer;
+var
+  slots : TIntegerArray;
+begin
+  slots  := Self.getSlots();
+  if length(slots) < 1 then Exit;
+  result := slots[0];
+end;
+
+function DItem.getBox():tbox;
+var
+  slots : TIntegerArray;
+begin
+  slots  := Self.getSlots();
+  if length(slots) < 1 then Exit;
+  result := GetInvBox(slots[0]);
+end;
+
+function DItem.RandPoint():tpoint;
+var
+  slots : TIntegerArray;
+begin
+  slots  := Self.getSlots();
+  if length(slots) < 1 then Exit;
+  result := RandPointInBox(GetInvBox(slots[0]));
+end;
+
+function DItem.getRandomSlot(): Integer;
+var
+  slots : TIntegerArray;
+begin
+  slots  := Self.getSlots();
+  if length(slots) < 1 then Exit;
+  result := slots[random(length(slots))]
+end;
+
+function IntInArray(Int:integer; IntArr:TIntegerArray):boolean;
+var
+  i:integer;
+begin
+  if length(IntArr) < 1 then exit;
+  for i := low(IntArr) to high(IntArr) do
+    if (Int = IntArr[i]) then
+      exit(true);
+  result := false;
+end;
+
+function DItem.getRandomSlotArray(): TIntegerArray;
+var
+  i     : Integer;
+  pnt   : TPoint;
+  Slots :TIntegerArray;
+begin
+  Slots := Self.GetSlots;
+  if (length(Slots) < 1) then exit;
+  repeat
+    i := random(1, 28);
+    if IntInArray(i, Slots) then
+      if not IntInArray(i, result) then
+      begin
+        setArrayLength(result, Length(result)+1);
+        result[High(result)] := i;
+      end;
+  until(length(result) = length(Slots));
+end;
+
+function DItem.inSlot(Slot:Integer): Boolean;
+var
+  slots : TIntegerArray;
+begin
+  slots  := Self.getSlots();
+  if length(slots) < 1 then Exit;
+  result := inIntArray(slots, Slot);
+end;
+
+function DItem.MouseInSlot:boolean;
+var
+  i:integer;
+begin
+  for i := 1 to 28 do
+    if MouseInBox(GetInvBox(i)) then
+      if self.InSlot(i) then
+      begin
+        writeln('Mouse in slot: ', i);
+        exit(true);
+      end;
+end;
+
+function DItem.interact(action: Variant; miss: Boolean=True): Boolean;
+var
+  slot : Integer;
+begin
+  slot := Self.getRandomSlot()
+  if slot < 1 then Exit(false);
+  result := interactSlotEx(slot, action, miss);
+end;
+
+function DItem.interact(action: Variant; RandSlot:boolean; Dist: integer): boolean; overload;
+var
+  slot: integer;
+begin
+  if RandSlot then
+    slot := Self.getRandomSlot()
+  else
+    slot := Self.getSlot();
+  if slot < 1 then Exit(false);
+  result := interactSlotEx(slot, action, dist);
+end;
+
+function DItem.fastDrop(OnlyOne:Boolean=True): Boolean;
+var
+  slot : Integer;
+begin
+  slot := Self.getSlot();
+  if slot < 1 then Exit(false);
+  if not isKeyDown(VK_SHIFT) then
+    keyDown(VK_SHIFT);
+  if (not mouseInBox(GetInvBox(Slot))) then
+    mouseBox(GetInvBox(Slot), MOUSE_MOVE);
+  fastClick(MOUSE_LEFT);
+  if OnlyOne then
+    keyUp(VK_SHIFT);
+  result := True;
+end;
+
+function DItem.FastDropAll(Miss:boolean=true):boolean;
+var
+  i:integer;
+  DropArr:TintegerArray;
+  FCol:TColEx;
+begin
+  if not self.InInventory then
+    exit(true);
+  FCol.Create(16777215, 1);
+  case random(100) of
+    0..75   : DropArr := [1, 5, 9, 13, 17, 21, 25, 2, 6, 10, 14, 18, 22, 26, 3, 7, 11, 15, 19, 23, 27, 4, 8, 12, 16, 20, 24, 28];
+    76.. 100: DropArr := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2, 3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
+  end;
+  for i := low(DropArr) to high(DropArr) do
+    if self.findIn(GetInvBox(DropArr[i])) then
+    begin
+      if miss then
+        MissMouse(randPointInBox(GetInvBox(DropArr[i])), 0, 0)
+      else
+        HumanMMouse(randPointInBox(GetInvBox(DropArr[i])), 0, 0);
+      if not isKeyDown(VK_SHIFT) then
+        keyDown(VK_SHIFT);
+      FastClick(Mouse_LEFT);
+      wait(randomrange(5, 75));
+      if FCol.FindIn(GetInvBox(DropArr[i])) then
+      begin
+        if isKeyDown(VK_SHIFT) then
+          keyUp(VK_SHIFT);
+        FastClick(MOUSE_LEFT);
+        wait(randomrange(75, 150));
+        keyDown(VK_SHIFT);
+      end;
+    end;
+  keyUp(VK_SHIFT);
+  result := true;
+end;
+
+
+// gets closest DItem to mouse location.
+function DItem.GetClosest:tbox;
+var
+  i, lowest, slot, x, y:integer;
+  MidBox: TPoint;
+  Slots: TIntegerArray;
+begin
+  if not self.InInventory then exit;
+  GetMousePos(x, y);
+  Slots := self.getSlots();
+  for i := low(Slots) to high(Slots) do
+  begin
+    MidBox := MiddleBox(GetInvBox(Slots[i]));
+    if not (lowest = 0) then
+    begin
+      if (Distance(x, y, MidBox.x, MidBox.y) < lowest) then
+      begin
+        lowest := Distance(x, y, MidBox.x, MidBox.y);
+        slot := slots[i];
+      end;
+    end else
+    begin
+      lowest := Distance(x, y, MidBox.x, MidBox.y);
+      slot := slots[i];
+    end;
+  end;
+  result := GetInvBox(slot);
+end;
+
+function isInventoryEmpty: boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to 28 do
+    if ItemInSlotEx(i) then
+      exit(false);
+  result := true;
+end;
+
+function isInventoryFull:boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to 28 do
+    if not ItemInSlotEx(i) then
+      exit(false);
+  result := true;
+end;
+
+function isInventoryEmptyExcept(Items:Array of DItem):boolean;
+var
+  i,a:integer;
+  ItemFound:boolean;
+begin
+  for i:= 1 to 28 do
+  begin
+    ItemFound := false;
+    if ItemInSlotEx(i) then
+    begin
+      for a:= low(items) to high(items) do
+        if items[a].Findin(GetInvBox(i)) then
+          ItemFound := true;
+      if not ItemFound then
+        exit(false);
+    end;
+  end;
+  result := true;
+end;
+
+function ItemsInInventory(items:array of ditem):boolean;
+var
+  i: integer;
+begin
+  for i := low(items) to high(items) do
+    if not (items[i].InInventory) then
+      exit(false);
+  result := true;
+end;
+
+function ItemsInSlot(Items:array of DItem; slot:integer):boolean;
+var
+  i:integer;
+begin
+  if ItemInSlot(slot) then
+  begin
+    if (length(Items) > 0) then
+      for i:= low(Items) to high(Items) do
+        if Items[i].inSlot(Slot) then
+          exit(true);
+    writeln('Confirmed that item in slot', i,' did not match items');
+  end;
+  result := false;
+end;
+
+function GetFreeSlots:TIntegerArray;
+var
+  i:integer;
+begin
+  if (GetInvCountEx = 28) then
+    exit([-1]);
+  for i := 1 to 28 do
+    if not ItemInSlot(i) then
+    begin
+      setArrayLength(result, Length(result)+1);
+      result[High(result)] := i;
+    end;
+end;
+
+function FastDropItems(Items:array of DItem; Miss:boolean=true):boolean;
+var
+  i,a:integer;
+  DropArr:TintegerArray;
+  FCol:TColEx;
+begin
+  FCol.Create(16777215, 1);
+  case random(100) of
+    0..75   : DropArr := [1, 5, 9, 13, 17, 21, 25, 2, 6, 10, 14, 18, 22, 26, 3, 7, 11, 15, 19, 23, 27, 4, 8, 12, 16, 20, 24, 28];
+    76.. 100: DropArr := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2, 3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
+  end;
+  if not isKeyDown(VK_SHIFT) then
+    keyDown(VK_SHIFT);
+  for i := low(DropArr) to high(DropArr) do
+  begin
+    for a := low(items) to high(items) do
+      if items[a].inSlot(DropArr[i]) then
+      begin
+        if not isKeyDown(VK_SHIFT) then
+          keyDown(VK_SHIFT);
+        if not MouseInBox(GetInvBox(DropArr[i])) then
+          if Miss then
+            MissMouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0)
+          else
+            HumanMmouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0);
+        FastClick(MOUSE_LEFT);
+        wait(randomrange(5, 75));
+        if FCol.FindIn(GetInvBox(DropArr[i])) then
+        begin
+          if isKeyDown(VK_SHIFT) then
+            keyUp(VK_SHIFT);
+          FastClick(MOUSE_LEFT);
+          wait(randomrange(75, 150));
+          keyDown(VK_SHIFT);
+        end;
+      end;
+  end;
+  keyUp(VK_SHIFT);
+  result := true;
+end;
+
+function FastDropAllItems(miss:boolean):boolean;
+var
+  i:integer;
+  DropArr:TintegerArray;
+  FCol:tColEx;
+  FirstInteract:boolean;
+begin
+  FCol.Create(16777215, 1);
+  FirstInteract := true;
+  if isInventoryEmpty then exit(true);
+  if not isKeyDown(VK_SHIFT) then
+    keyDown(VK_SHIFT);
+  case random(100) of
+    0..75   : DropArr := [1, 5, 9, 13, 17, 21, 25, 2, 6, 10, 14, 18, 22, 26, 3, 7, 11, 15, 19, 23, 27, 4, 8, 12, 16, 20, 24, 28];
+    76.. 100: DropArr := [1, 5, 9, 13, 17, 21, 25, 26, 22, 18, 14, 10, 6, 2, 3, 7, 11, 15, 19, 23, 27, 28, 24, 20, 16, 12, 8, 4];
+  end;
+  for i := low(DropArr) to high(DropArr) do
+  begin
+    if not isKeyDown(VK_SHIFT) then
+      keyDown(VK_SHIFT);
+    if not MouseInBox(GetInvBox(DropArr[i])) then
+      if Miss then
+        MissMouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0)
+          else
+        HumanMmouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0);
+    FastClick(MOUSE_LEFT);
+    if FirstInteract then
+    begin
+      wait(randomrange(275, 390));
+      FirstInteract := false;
+    end else
+      wait(randomrange(5, 75));
+    if FCol.FindIn(GetInvBox(DropArr[i])) then
+    begin
+      if isKeyDown(VK_SHIFT) then
+        keyUp(VK_SHIFT);
+      FastClick(MOUSE_LEFT);
+      wait(randomrange(75, 150));
+      keyDown(VK_SHIFT);
+    end;
+  end;
+  if isKeyDown(VK_SHIFT) then
+    keyUp(VK_SHIFT);
+  result := true;
+end;

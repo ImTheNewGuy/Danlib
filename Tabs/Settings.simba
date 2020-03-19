@@ -1,0 +1,9 @@
+function GetSettingsButton(Button:string):tbox;
+var
+  w,h: integer;
+begin
+  GetClientDimensions(w, h);
+  case Button of
+    'House Options':result := ToBox(w-161, h-76, w-83, h-43);
+  end;
+end;

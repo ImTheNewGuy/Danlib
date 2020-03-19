@@ -1,0 +1,11 @@
+function menuOpenEx(): Boolean;
+var
+  tmpCol : TColEx;
+  w, h:integer;
+begin
+  GetClientDimensions(w, h);
+  tmpCol.create(4674653,0);
+  result := (tmpCol.count(toBox(4,4,w-1,h-1)) >= 100);
+end;
+
+

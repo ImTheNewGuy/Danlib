@@ -1,0 +1,220 @@
+var
+  UptxtTriggered:boolean;
+
+function GetUpText:string;
+var
+  s:string;
+begin
+  OCR.Init(UpFont);
+  s := OCR.Recognize(TBox([3, 3, 500, 25]), TCompareRules([-1, 85, True, 55]));
+  result := s;
+  OCR.Free;
+end;
+
+procedure TriggerUptext;
+begin
+  if not UptxtTriggered then
+  begin
+    GetUpText;
+    UptxtTriggered := true;
+  end;
+end;
+
+function TestUpText:string;
+var
+  s:string;
+begin
+  TriggerUptext;
+  OCR.Init(UpFont);
+  s := OCR.Recognize(TBox([4,3,500,20]), FontSettingTrh);
+  writeln('Uptext [FontSettingTrh] result: ', s);
+  s := OCR.Recognize(TBox([4,3,500,20]), OCR_RULES_DEFAULT);
+  writeln('Uptext [OCR_RULES_DEFAULT] result: ', s);
+  s := OCR.Recognize(TBox([4,3,500,20]), OCR_RULES_UPTEXT);
+  writeln('Uptext [OCR_RULES_UPTEXT] result: ', s);
+  result := s;
+  OCR.Free;
+end;
+
+{function IsUpTextEx(text:string):boolean;
+var
+  s:string;
+  OCR: TSimpleOCR;
+begin
+  OCR.Init('UpChars07_s');  //or preferable: OCR.Init('UpChars07_s',,,ExportImageTarget());
+  s := OCR.Recognize(TBox([4,3,500,18]), TCompareRules([-1,72,True,55]));
+  exit(ArrInStr([text], s));
+end;}
+
+function IsUpTextEx(text:string):boolean;
+var
+  s:string;
+begin
+  TriggerUptext;
+  OCR.Init(UpFont);
+  s := OCR.Recognize(TBox([4,3,500,18]), FontSettingTrh);
+  result := ArrInStr([text], s);
+  OCR.Free;
+end;
+
+{function IsUptextMultiEx(StrArr:TStringArray):boolean;
+var
+  s:string;
+  OCR: TSimpleOCR;
+  i:integer;
+begin
+  OCR.Init('UpChars07_s');  //or preferable: OCR.Init('UpChars07_s',,,ExportImageTarget());
+  s := OCR.Recognize(TBox([4,3,500,18]), TCompareRules([-1,72,True,55]));
+  for i := low(StrArr) to high(StrArr) do
+    if ArrInStr([StrArr[i]], s) then
+      exit(true);
+  result := false;
+end;}
+function IsUptextMultiEx(StrArr:TStringArray):boolean;
+var
+  s:string;
+  i, starttick:integer;
+begin
+  TriggerUptext;
+  starttick := gettimerunning;
+  OCR.Init(UpFont);
+  s := OCR.Recognize(TBox([4,3,500,18]), FontSettingTrh);
+  for i := low(StrArr) to high(StrArr) do
+    if ArrInStr([StrArr[i]], s) then
+    begin
+      OCR.free;
+      exit(true);
+    end;
+  s := OCR.Recognize(TBox([4,3,500,18]), OCR_RULES_DEFAULT);
+  for i := low(StrArr) to high(StrArr) do
+    if ArrInStr([StrArr[i]], s) then
+    begin
+      OCR.free;
+      exit(true);
+    end;
+  s := OCR.Recognize(TBox([4,3,500,18]), OCR_RULES_UPTEXT);
+  for i := low(StrArr) to high(StrArr) do
+    if ArrInStr([StrArr[i]], s) then
+    begin
+      OCR.free;
+      exit(true);
+    end;
+  result := false;
+  OCR.Free;
+  writeln('Took ', gettimerunning - starttick, ' to run block');
+end;
+
+{function WaitUpTextMultiEx(StrArr:TStringArray; WaitTime:integer):boolean;
+var
+  s:string;
+  OCR: TSimpleOCR;
+  i, startTime:integer;
+begin
+  startTime := GetTimeRunning;
+  while ((GetTimeRunning - StartTime) < WaitTime) do
+  begin
+    OCR.Init('UpChars07_s');  //or preferable: OCR.Init('UpChars07_s',,,ExportImageTarget());
+    s := OCR.Recognize(TBox([4,3,500,18]), TCompareRules([-1,72,True,55]));
+    for i := low(StrArr) to high(StrArr) do
+      if ArrInStr([StrArr[i]], s) then
+        exit(true);
+  end;
+  result := false;
+end;  }
+function WaitUpTextMultiEx(StrArr:TStringArray; WaitTime:integer):boolean;
+var
+  s:string;
+  i, startTime:integer;
+begin
+  TriggerUptext;
+  OCR.Init(UpFont);
+  startTime := GetTimeRunning;
+  while ((GetTimeRunning - StartTime) < WaitTime) do
+  begin
+    s := OCR.Recognize(TBox([4,3,500,18]), FontSettingTrh);
+    for i := low(StrArr) to high(StrArr) do
+      if ArrInStr([StrArr[i]], s) then
+      begin
+        OCR.free;
+        exit(true);
+      end;
+    s := OCR.Recognize(TBox([4,3,500,18]), OCR_RULES_DEFAULT);
+    for i := low(StrArr) to high(StrArr) do
+      if ArrInStr([StrArr[i]], s) then
+      begin
+        OCR.free;
+        exit(true);
+      end;
+    s := OCR.Recognize(TBox([4,3,500,18]), OCR_RULES_UPTEXT);
+    for i := low(StrArr) to high(StrArr) do
+      if ArrInStr([StrArr[i]], s) then
+      begin
+        OCR.free;
+        exit(true);
+      end;
+  end;
+  result := false;
+  OCR.Free;
+end;
+
+//Runelite tooltip functions only
+
+Const
+  TYPE_OBJECT := 0;
+  TYPE_ITEM   := 1;
+  TYPE_NPC    := 2;
+
+function GetToolTipText(TextType:integer; SearchDistX:integer = 200; SearchDistY:integer = 50):string;
+var
+  x, y, TempSearchDistX, TempSearchDistY:integer;
+  Text:string;
+  MSB:tbox;
+  TextCol:integer;
+begin
+  case TextType of
+    0:TextCol := 16776960;
+    1:TextCol := 4231423;
+    2:TextCol := 65535;
+  end;
+
+  MSB := Tobox(GetMSDimensions.x1+1, GetMSDimensions.y1+1, GetMSDimensions.x2-1, GetMSDimensions.y2-1);
+  If MouseInBox(MSB) then
+  begin
+    GetMousePos(x, y);
+    TempSearchDistX := SearchDistX;
+    TempSearchDistY := SearchDistY;
+
+    if (x + SearchDistX > GetMSDimensions.x2-1) then
+    begin
+      SearchDistX := round((GetMSDimensions.x2-1) - x);
+      TempSearchDistX := TempSearchDistX-SearchDistX;
+    end else
+      TempSearchDistX := 0;
+    if (y + SearchDistY > GetMSDimensions.y2-1) then
+    begin
+      SearchDistY := round((GetMSDimensions.y2-1) - y);
+      TempSearchDistY := TempSearchDistY-SearchDistY;
+    end else
+      TempSearchDistY := 0;
+
+    Text := Trim(getTextAtEx(x-TempSearchDistX, y-TempSearchDistY, x+SearchDistX, y+SearchDistY, 0, 5, 4, 16777215, 0, 'StatChars07'));
+    Text := (Text + ' ' + Trim(getTextAtEx(x-TempSearchDistX, y-TempSearchDistY, x+SearchDistX, y+SearchDistY, 0, 5, 4, TextCol, 0, 'StatChars07')));
+    result := Text;
+    //writeln('Debug: [SearchDistX: ', SearchDistX,'] [SearchDistY: ', SearchDistY,'] [TempSearchDistX: ',TempSearchDistX,'] [TempSearchDistY: ', TempSearchDistY,']');
+  end;
+end;
+
+function IsToolTipTextMulti(StrArr:TStringArray; TextType:integer):boolean;
+begin
+  result := ArrInStr(StrArr, GetToolTipText(TextType));
+end;
+
+function WaitIsToolTipTextMulti(StrArr:TStringArray; TextType:integer; WaitTime:integer):boolean;
+var
+  t:timer;
+begin
+  t.start();
+  while (t.TimeElapsed < WaitTime) do
+    if IsToolTipTextMulti(StrArr, TextType) then
+      exit(true);
+end;

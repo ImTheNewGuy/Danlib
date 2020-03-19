@@ -1,0 +1,84 @@
+function GetPrayerBoxEx(Prayer: string): TBox;
+var
+  TempBox: Tbox;
+begin
+  TempBox := GetMenuBox('Combat');
+  case Capitalize(Prayer) of
+    'Thick Skin':             Result := ToBox((TempBox.X1+29), (TempBox.Y1+46), (TempBox.X1+62), (TempBox.Y1+79));
+    'Burst Of Strength':      Result := ToBox((TempBox.X1+66), (TempBox.Y1+46), (TempBox.X1+99), (TempBox.Y1+79));
+    'Clarity Of Thought':     Result := ToBox((TempBox.X1+103), (TempBox.Y1+46), (TempBox.X1+136), (TempBox.Y1+79));
+    'Sharp Eye':              Result := ToBox((TempBox.X1+140), (TempBox.Y1+46), (TempBox.X1+173), (TempBox.Y1+79));
+    'Mystic Will':            Result := ToBox((TempBox.X1+177), (TempBox.Y1+46), (TempBox.X1+210), (TempBox.Y1+79));
+
+    'Rock Skin':              Result := ToBox((TempBox.X1+29), (TempBox.Y1+83), (TempBox.X1+62), (TempBox.Y1+116));
+    'Superhuman Strength':    Result := ToBox((TempBox.X1+66), (TempBox.Y1+83), (TempBox.X1+99), (TempBox.Y1+116));
+    'Improved Reflexes':      Result := ToBox((TempBox.X1+103), (TempBox.Y1+83), (TempBox.X1+136), (TempBox.Y1+116));
+    'Rapid Restore':          Result := ToBox((TempBox.X1+140), (TempBox.Y1+83), (TempBox.X1+173), (TempBox.Y1+116));
+    'Rapid Heal':             Result := ToBox((TempBox.X1+177), (TempBox.Y1+83), (TempBox.X1+210), (TempBox.Y1+116));
+
+    'Protect Items':          Result := ToBox((TempBox.X1+29), (TempBox.Y1+120), (TempBox.X1+62), (TempBox.Y1+153));
+    'Hawk Eye':               Result := ToBox((TempBox.X1+66), (TempBox.Y1+120), (TempBox.X1+99), (TempBox.Y1+153));
+    'Mystic Lore':            Result := ToBox((TempBox.X1+103), (TempBox.Y1+120), (TempBox.X1+136), (TempBox.Y1+153));
+    'Steel Skin':             Result := ToBox((TempBox.X1+140), (TempBox.Y1+120), (TempBox.X1+173), (TempBox.Y1+153));
+    'Ultimate Strength':      Result := ToBox((TempBox.X1+177), (TempBox.Y1+120), (TempBox.X1+210), (TempBox.Y1+153));
+
+    'Incredible Reflexes':    Result := ToBox((TempBox.X1+29), (TempBox.Y1+157), (TempBox.X1+62), (TempBox.Y1+190));
+    'Protect From Magic':     Result := ToBox((TempBox.X1+66), (TempBox.Y1+157), (TempBox.X1+99), (TempBox.Y1+190));
+    'Protect From Missiles':  Result := ToBox((TempBox.X1+103), (TempBox.Y1+157), (TempBox.X1+136), (TempBox.Y1+190));
+    'Protect From Melee':     Result := ToBox((TempBox.X1+140), (TempBox.Y1+157), (TempBox.X1+173), (TempBox.Y1+190));
+    'Eagle Eye':              Result := ToBox((TempBox.X1+177), (TempBox.Y1+157), (TempBox.X1+210), (TempBox.Y1+190));
+
+    'Mystic Might':           Result := ToBox((TempBox.X1+29), (TempBox.Y1+194), (TempBox.X1+62), (TempBox.Y1+227));
+    'Retribution':            Result := ToBox((TempBox.X1+66), (TempBox.Y1+194), (TempBox.X1+99), (TempBox.Y1+227));
+    'Redemption':             Result := ToBox((TempBox.X1+103), (TempBox.Y1+194), (TempBox.X1+136), (TempBox.Y1+227));
+    'Smite':                  Result := ToBox((TempBox.X1+140), (TempBox.Y1+194), (TempBox.X1+173), (TempBox.Y1+227));
+    'Preserve':               Result := ToBox((TempBox.X1+177), (TempBox.Y1+194), (TempBox.X1+210), (TempBox.Y1+227));
+
+    'Chivalry':               Result := ToBox((TempBox.X1+29), (TempBox.Y1+231), (TempBox.X1+62), (TempBox.Y1+264));
+    'Piety':                  Result := ToBox((TempBox.X1+66), (TempBox.Y1+231), (TempBox.X1+99), (TempBox.Y1+264));
+    'Rigour':                 Result := ToBox((TempBox.X1+103), (TempBox.Y1+231), (TempBox.X1+136), (TempBox.Y1+264));
+    'Augury':                 Result := ToBox((TempBox.X1+140), (TempBox.Y1+231), (TempBox.X1+173), (TempBox.Y1+264));
+  end;
+end;
+
+function isPrayerActiveEx(PrayerName: String): Boolean;
+var
+  Color_PrayerActive: TColEx;
+begin
+  if ChangeTab('Prayer') then
+  begin
+    // Creates the color and checks to see if its located within Tbox meaning prayer is active
+    Color_PrayerActive.create(7184306, 6, 0.02, 2.52);
+    result := Color_PrayerActive.findIn(GetPrayerBoxEx(PrayerName));
+  end;
+end;
+
+function togglePrayerEx(PrayerName: string; Enable: Boolean): Boolean;
+var
+  pnt:Tpoint;
+begin
+  if ChangeTab('Prayer') then
+  begin
+    pnt := RandPointInBox(GetPrayerBoxEx(PrayerName));
+    if Enable then
+      if isPrayerActiveEx(PrayerName) then
+        exit(true)
+      else
+      begin
+        //mouseBox(GetPrayerBoxEx(PrayerName), MOUSE_LEFT);
+        MissMouse(pnt, 0, 0);
+        FastClick(MOUSE_LEFT);
+      end;
+
+    if (not Enable) then
+      if isPrayerActiveEx(PrayerName) then
+      begin
+        //mouseBox(GetPrayerBoxEx(PrayerName), MOUSE_LEFT)
+        MissMouse(pnt, 0, 0);
+        FastClick(MOUSE_LEFT);
+      end else
+        exit(true);
+  end else
+    writeln('fail');
+end;
+

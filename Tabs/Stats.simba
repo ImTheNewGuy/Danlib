@@ -1,0 +1,54 @@
+Const
+  SkillArray :=['Attack', 'Hitpoints', 'Mining', 'Strength', 'Agility', 'Smithing', 'Defence', 'Herblore', 'Fishing', 'Ranged', 'Thieving', 'Cooking', 'Prayer',
+                'Crafting', 'Firemaking', 'Magic', 'Fletching', 'Woodcutting', 'Runecrafting', 'Slayer', 'Farming', 'Construction', 'Hunter'];
+
+function GetStatsBox(Stat: string): TBox;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetMenuBox('Combat');
+  case Capitalize(Stat) of
+    'Attack'      : Result := ToBox((TempBox.X1+26),(TempBox.Y1+38), (TempBox.X1+87), (TempBox.Y1+69));
+    'Hitpoints'   : Result := ToBox((TempBox.X1+89),(TempBox.Y1+38), (TempBox.X1+150), (TempBox.Y1+69));
+    'Mining'      : Result := ToBox((TempBox.X1+152),(TempBox.Y1+38), (TempBox.X1+213), (TempBox.Y1+69));
+
+    'Strength'    : Result := ToBox((TempBox.X1+26),(TempBox.Y1+70), (TempBox.X1+87), (TempBox.Y1+101));
+    'Agility'     : Result := ToBox((TempBox.X1+89),(TempBox.Y1+70), (TempBox.X1+150), (TempBox.Y1+101));
+    'Smithing'    : Result := ToBox((TempBox.X1+152),(TempBox.Y1+70), (TempBox.X1+213), (TempBox.Y1+101));
+
+    'Defence'     : Result := ToBox((TempBox.X1+26),(TempBox.Y1+102), (TempBox.X1+87), (TempBox.Y1+133));
+    'Herblore'    : Result := ToBox((TempBox.X1+89),(TempBox.Y1+102), (TempBox.X1+150), (TempBox.Y1+133));
+    'Fishing'     : Result := ToBox((TempBox.X1+152),(TempBox.Y1+102), (TempBox.X1+213), (TempBox.Y1+133));
+
+    'Ranged'      : Result := ToBox((TempBox.X1+26),(TempBox.Y1+134), (TempBox.X1+87), (TempBox.Y1+165));
+    'Thieving'    : Result := ToBox((TempBox.X1+89),(TempBox.Y1+134), (TempBox.X1+150), (TempBox.Y1+165));
+    'Cooking'     : Result := ToBox((TempBox.X1+152),(TempBox.Y1+134), (TempBox.X1+213), (TempBox.Y1+165));
+
+    'Prayer'      : Result := ToBox((TempBox.X1+26),(TempBox.Y1+166), (TempBox.X1+87), (TempBox.Y1+197));
+    'Crafting'    : Result := ToBox((TempBox.X1+89),(TempBox.Y1+166), (TempBox.X1+150), (TempBox.Y1+197));
+    'Firemaking'  : Result := ToBox((TempBox.X1+152),(TempBox.Y1+166), (TempBox.X1+213), (TempBox.Y1+197));
+
+    'Magic'       : Result := ToBox((TempBox.X1+26),(TempBox.Y1+198), (TempBox.X1+87), (TempBox.Y1+229));
+    'Fletching'   : Result := ToBox((TempBox.X1+89),(TempBox.Y1+198), (TempBox.X1+150), (TempBox.Y1+229));
+    'Woodcutting' : Result := ToBox((TempBox.X1+152),(TempBox.Y1+198), (TempBox.X1+213), (TempBox.Y1+229));
+
+    'Runecrafting': Result := ToBox((TempBox.X1+26),(TempBox.Y1+230), (TempBox.X1+87), (TempBox.Y1+261));
+    'Slayer'      : Result := ToBox((TempBox.X1+89),(TempBox.Y1+230), (TempBox.X1+150), (TempBox.Y1+261));
+    'Farming'     : Result := ToBox((TempBox.X1+152),(TempBox.Y1+230), (TempBox.X1+213), (TempBox.Y1+261));
+
+    'Construction': Result := ToBox((TempBox.X1+26),(TempBox.Y1+262), (TempBox.X1+87), (TempBox.Y1+293));
+    'Hunter'      : Result := ToBox((TempBox.X1+89),(TempBox.Y1+262), (TempBox.X1+150), (TempBox.Y1+293));
+  end;
+end;
+
+function GetStatLevel(Stat: string):integer;
+var
+  b:tbox;
+begin
+  if not ChangeTab('Stats') then
+    exit(-1);
+  b := GetStatsBox(Stat);
+  b := ToBox(b.x1, round((b.y2 - b.y1) /2) + b.y1-2, b.x2, b.y2);
+  result := strToIntDef(getTextAtEx(b.X1, b.Y1, b.X2, b.Y2,0,5,1,65535,0,'StatChars07'),-1);
+end;
+

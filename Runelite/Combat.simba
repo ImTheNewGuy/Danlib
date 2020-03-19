@@ -1,0 +1,49 @@
+{*RuneLite combat function*}
+
+function InCombat:boolean;
+var
+  i:integer;
+  boxes:array of tbox;
+  GreenBarCol:TColEx;
+begin
+  GreenBarCol.create(2582535, 1, 0.01, 0.01);
+  boxes := FindRLIconBoxes;
+  for i := low(boxes) to high(boxes) do
+    if GreenBarCol.FindIn(boxes[i]) then
+      exit(true);
+end;
+
+function WaitForCombat(failSafe:integer):boolean;
+var
+  FST: timer;
+  xp:integer;
+begin
+  xp := GetXPBarAMountEx;
+  FST.Start;
+  while not InCombat do
+  begin
+    if (GetXPBarAmountEx > xp) then
+      exit(true);
+    wait(100);
+    if (failSafe > 0) then
+      if (FST.timeElapsed > failSafe) then
+        exit(false);
+  end;
+  result := true;
+end;
+
+function WaitFinishCombat(failSafe:integer):boolean;
+var
+  FST:timer;
+begin
+  FST.Start;
+  while InCombat do
+  begin
+    wait(100);
+    if (failSafe > 0) then
+      if (FST.TimeElapsed > failSafe) then
+        exit(true);
+  end;
+  result := true;
+end;
+

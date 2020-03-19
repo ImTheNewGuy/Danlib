@@ -1,0 +1,35 @@
+var
+  ScriptStartTime:string;
+  Process:TProcess;
+
+function FormatDiscordMsg(xp:integer; Reason:string):string;
+begin
+  if (IP = '') then
+    IP := getPage('http://api.ipify.org/?format=raw');
+  result :=
+  ' \n________________\nScript Name: '+ScriptName+
+  ' \nPlayer Name: '+ActivePlayerName+
+  ' \nStart Time: '+ScriptStartTime+
+  ' \nStop Time : '+TheTime+
+  ' \nDuration  : '+MsToTime(GetTimeRunning, Time_Formal)+
+  ' \nXP Gained : '+IntToStr(XP)+
+  ' \nIP        : '+IP+
+  ' \nTerminate Reason: '+Reason+
+  ' \n________________\';
+end;
+
+procedure SendDiscordWebhook(JSON: string);
+var
+  process:TProcess;
+  s:string;
+begin
+  process.init(nil);
+  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"'+JSON+'" }" '+DiscordWebhookURL;
+  process.setcommandline(s);
+  process.Execute();
+  process.free();
+end;
+
+begin
+  ScriptStartTime := TheTime;
+end;

@@ -1,0 +1,415 @@
+const
+  BankButtons := ['Swap', 'Insert', 'Item', 'Note', 'Placeholders', 'Search','Deposit Inv', 'Deposit Equip'];
+var
+  BBox, BTBox, TSBox, DIBox, SwapBox, InsBox, ItemButBox, NoteBox, PHBox, searchButbox, DEBox, WithdrawXBox, WithdrawAllBox: TBox;
+  FoundBoxes: boolean;
+
+
+function GetBankScreenBox(var BankBox:TBox; TabbedBanking:boolean):boolean;
+var
+  BankInterfaceCol: TColEx;
+  tpa: TpointArray;
+  w, h:integer;
+  ATPA:T2DPointArray;
+  TempBox: TBox;
+begin
+  if not TabbedBanking then
+    if (BBox.X1 > 0) then
+    begin
+      BankBox := BBox; // Sets the bank screen to a static size once it has been found.
+      exit(true);
+    end;
+  if TabbedBanking then
+     if (BTBox.X1 > 0) then
+    begin
+      BankBox := BTBox; // Sets the bank screen to a static size once it has been found [tabbed banking].
+      exit(true);
+    end;
+  //2963519, 4, 0.37, 0.45);
+  BankInterfaceCol.create(3358280, 1, 0.80, 0.41);
+  GetClientDimensions(w, h);
+  if BankInterfaceCol.findAllIn(ToBox(1, 1, w-1, h-1), tpa) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10, 10);
+    FilterTPAsBetween(ATPA, 0, 2500);
+    SortATPASize(ATPA, true);
+    if Length(ATPA) < 1 then Exit;
+    if not TabbedBanking then
+    begin
+      BankBox := GetTPABounds(ATPA[0]);
+    end else
+    begin
+      TempBox := GetTPABounds(ATPA[0]);
+      BankBox := [TempBox.X1, (TempBox.Y1+68), TempBox.X2, TempBox.Y2];
+    end;
+    if (BankBox.X1 > 0) then
+    begin
+      Result := true;
+      if not TabbedBanking then
+        BBox := BankBox
+      else
+        BTBox := BankBox;
+    end;
+  end;
+end;
+
+function IsBankOpenEx:boolean;
+var
+  TB:Tbox;
+  x, y: integer;
+begin
+  Result := false;
+  if (TSBox.x2 < 1) then
+    GetBankScreenBox(TB, false)
+  else
+    TB := TSBox;
+  if findTextEx(x, y, ['The Bank of Runescape', 'Bank of Rune', 'Bank of', 'Tab', 'Gielinor', 'howing item'], ['UpChars07'], TB) then
+    if not FindTextEx(x, y, ['Please enter your', 'PIN', 'using the buttons below'], ['UpChars07'], TB) then
+    begin
+      if (TSBox.x2 < 1) then
+        TSBox := ToBox((TB.X1-1), (TB.Y1-1), (TB.X2+200), (TB.Y2+17));
+      exit(true);
+    end;
+end;
+
+function GetBankBox(tabbed:boolean = true):tbox;
+var
+  b:tbox;
+begin
+  if IsBankOpenEx then
+  begin
+    GetBankScreenBox(b, tabbed);
+    result := b;
+  end else
+    result := ToBox(-1, -1, -1, -1);
+end;
+
+function GetBankButton(button: string):Tbox;
+var
+  TB:Tbox;
+begin
+  GetBankScreenBox(TB, false);
+  if not IsBankOpenEx then exit;
+  case button of
+    // Rearrange mode
+    BANK_SWAP         : begin Result := ToBox((TB.X2-476), (TB.Y2-20), (TB.X2-401), TB.Y2); SwapBox := result; end;
+    BANK_INSERT       : begin Result := ToBox((TB.X2-400), (TB.Y2-20), (TB.X2-325), TB.Y2); InsBox := result; end;
+    //Withdraw as
+    BANK_ITEM         : begin Result := ToBox((TB.X2-317), (TB.Y2-20), (TB.X2-242), TB.Y2); ItemButBox := result; end;
+    BANK_NOTE         : begin Result := ToBox((TB.X2-241), (TB.Y2-20), (TB.X2-166), TB.Y2); NoteBox := result; end;
+    //buttons
+    BANK_PLACEHOLDERS : begin Result := ToBox((TB.X2-150), (TB.Y2-35), (TB.X2-115), TB.Y2); PHBox := result; end;
+    BANK_SEARCH       : begin Result := ToBox((TB.X2-111), (TB.Y2-35), (TB.X2-76), TB.Y2); searchButbox := result; end;
+    BANK_DepositInv   : begin result := ToBox((TB.X2-72), (TB.Y2-35), (TB.X2-37), TB.Y2); DIBox := result; end;
+    BANK_DepositEquip : begin Result := ToBox((TB.X2-35), (TB.Y2-35), TB.X2, TB.Y2); DEBox := result; end;
+    BANK_Withdraw_X   : begin Result := ToBox((TB.X2-201),(TB.y2-19), (TB.x2 - 177), tb.y2); WithdrawXBox := result; end;
+    BANK_Withdraw_All : begin Result := ToBox((TB.X2-176),(TB.y2-19), (TB.x2 - 152), tb.y2); WithdrawAllBox := result; end;
+  end;
+end;
+
+function DepositAll:boolean;
+begin
+  if not IsBankOpenEx then exit;
+  MissMouse(RandPointInBox(GetBankButton(BANK_DepositInv)), 0, 0);
+  wait(randomrange(75, 175));
+  FastClick(MOUSE_LEFT);
+end;
+
+function GetBankTabBox(TabNum:Integer):Tbox;
+var
+  TB: TBox;
+begin
+  if not IsBankOpenEx then exit;
+  if ((TabNum <0) or (TabNum > 9)) then Exit;
+  GetBankScreenBox(TB, false);
+  case TabNum of
+    0 : Result := ToBox((TB.X1+40), (TB.Y1+33), (TB.X1+75), (TB.Y1+64));
+    1 : Result := ToBox((TB.X1+81), (TB.Y1+33), (TB.X1+116), (TB.Y1+64));
+    2 : Result := ToBox((TB.X1+121), (TB.Y1+33), (TB.X1+156), (TB.Y1+64));
+    3 : Result := ToBox((TB.X1+161), (TB.Y1+33), (TB.X1+196), (TB.Y1+64));
+    4 : Result := ToBox((TB.X1+201), (TB.Y1+33), (TB.X1+236), (TB.Y1+64));
+    5 : Result := ToBox((TB.X1+241), (TB.Y1+33), (TB.X1+276), (TB.Y1+64));
+    6 : Result := ToBox((TB.X1+281), (TB.Y1+33), (TB.X1+316), (TB.Y1+64));
+    7 : Result := ToBox((TB.X1+321), (TB.Y1+33), (TB.X1+356), (TB.Y1+64));
+    8 : Result := ToBox((TB.X1+361), (TB.Y1+33), (TB.X1+396), (TB.Y1+64));
+    9 : Result := ToBox((TB.X1+401), (TB.Y1+33), (TB.X1+436), (TB.Y1+64));
+  end;
+end;
+
+function DoesTabExist(TabNum:integer): boolean;
+var
+  TB: TBox;
+  SymCol, NoTabCol: TColEx;
+begin
+  TB := getBankTabBox(TabNum);
+  SymCol.create(5135982, 1);
+  if SymCol.FindIn(GetBankTabBox(TabNum)) then
+    exit(false);
+  NoTabCol.create(3358280, 1, 0.80, 0.41);
+  if (NoTabCol.Count(GetBankTabBox(TabNum)) > 1100) then
+    exit(false);
+  result := true;
+end;
+
+function IsBankTabActive(TabNum:integer):boolean;
+var
+  TB: TBox;
+  LineCol: TColEx;
+begin
+  TB := getBankTabBox(TabNum);
+  LineCol.Create(5334129, 1);
+  if LineCol.FindIn(ToBox((tb.x1+5), (tb.y1+5), (tb.x2-5), (tb.y2+5))) then
+    exit(false)
+  else
+    exit(true);
+end;
+
+function GetActiveBankTab:integer;
+var
+  i:integer;
+begin
+  if not DoesTabExist(1) then exit(0);
+  for i := 0 to 9 do
+    if IsBankTabActive(i) then
+      exit(i);
+end;
+
+function ChangeBankTab(TabNum:integer):boolean
+var
+  ChangeTimer:TImer;
+begin
+  if IsBankTabActive(TabNum) then
+    exit(true)
+  else
+  begin
+    MouseBox2(GetBankTabBox(TabNum), MOUSE_LEFT);
+    ChangeTimer.start();
+    while not IsBankTabActive(TabNum) do
+    begin
+      wait(100);
+      if (ChangeTimer.TimeElapsed > 5000) then
+        exit(false);
+    end;
+    result := true;
+  end;
+end;
+
+
+function CloseBank(DoWait:boolean):boolean;
+var
+  TB: TBox;
+  pnt: TPoint;
+  WaitT: Timer;
+begin
+  if not IsBankOpenEx then exit(true);
+  GetBankScreenBox(TB, false);
+  pnt := RandPointInBox(ToBox(TB.X1+453, TB.Y1, TB.X1+478, TB.Y1+22));
+  MissMouse(pnt, 0, 0);
+  if waitUpTextMulti(['Close'], 500) then
+    FastClick(MOUSE_LEFT)
+  else
+    exit(false);
+  if DoWait then
+  begin
+    WaitT.Start;
+    while (WaitT.TimeElapsed < 1000) do
+      if IsBankOpenEx then
+        exit(true);
+    if (WaitT.TimeElapsed > 1000) then
+      exit(false);
+  end;
+  Result := true;
+end;
+
+function isBankButtonSelected(Button:string):boolean;
+var
+  TB: TBox;
+  SCol: TColEx;
+begin
+  if not IsBankOpenEx then exit(false);
+  TB := GetBankButton(Button);
+  SCol.Create(1908610, 8, 0.02, 0.10);
+  Result := SCol.FindIn(TB);
+end;
+
+function IsPinScreen(var PBox:Tbox): boolean;
+var
+  BoxCol: TColEx;
+  TPA:TPointArray;
+  ATPA: T2DPointArray;
+  i, x, y:integer;
+  PinBox: TBox;
+begin
+  BoxCol.Create(3358280, 1, 0.80, 0.41);
+  if BoxCol.FindAllIn(GetMSDimensions, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10, 10);
+    SortATPASize(ATPA, true);
+    PinBox := GetTPABounds(ATPA[0]);
+    if FindTextEx(x, y, ['your PIN', 'PIN', 'using the buttons belo'], ['UpChars07'], PinBox) then
+    begin
+      PBox := PinBox;
+      BBox := [0, 0, 0, 0];
+      exit(true);
+    end;
+  end;
+end;
+
+function IsPinScreen: boolean; overload;
+var
+  BoxCol: TColEx;
+  TPA:TPointArray;
+  ATPA: T2DPointArray;
+  i, x, y:integer;
+  PinBox: TBox;
+begin
+  BoxCol.Create(3358280, 1, 0.80, 0.41);
+  if BoxCol.FindAllIn(GetMSDimensions, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 10, 10);
+    SortATPASize(ATPA, true);
+    PinBox := GetTPABounds(ATPA[0]);
+    if FindTextEx(x, y, ['your PIN', 'PIN', 'using the buttons belo'], ['UpChars07'], PinBox) then
+    begin
+      BBox := [0, 0, 0, 0];
+      exit(true);
+    end;
+  end;
+end;
+
+function EnterPin(pin:string): boolean;
+var
+  TPA:TPointArray;
+  ATPA: T2DPointArray;
+  i, a, x, y:integer;
+  ButtonCol:TColEx;
+  PinBox:TBox;
+  WaitTTimer, MaxPinTimer:Timer;
+  rPoint:Tpoint;
+begin
+  MaxPinTimer.start();
+  if IsPinScreen(PinBox) then
+    ButtonCol.create(659806, 9, 0.06, 2.14)
+  else
+    exit(false);
+  if ButtonCol.findAllIn(PinBox, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 1, 1);
+    FilterTPAsBetween(ATPA, 0, 3000);
+  end;
+  if ((Pin = '') or (length(Pin) <> 4)) then
+  begin
+    writeln('Not a valid pin!');
+    exit(false);
+  end;
+  if length(ATPA) < 1 then exit(false);
+  for i := 1 to 4 do
+  begin
+    if (MaxPinTimer.TimeElapsed > 30000) then
+    begin
+      writeln('Exceeded max pin timer.');
+      exit(false);
+    end;
+    a := 0;
+    for a := low(ATPA) to high(ATPA) do
+    begin
+      if FindTextEx(x, y, [pin[i]], ['UpChars07'], GetTPABounds(ATPA[a])) then
+      begin
+        //DebugTPA(ATPA[a], '');
+        rPoint := RandPointInBox(GetTPABounds(ATPA[a]));
+        MissMouse(rPoint, 0, 0);
+        Wait(randomrange(5, 65));
+        if WaitUpTextMulti(['Select', 'elec'], 300) then
+        begin
+          FastClick(MOUSE_LEFT);
+          WaitTTimer.start();
+          repeat
+            if (i = 1) then
+              if not FindTextEx(x, y, ['RST'], ['UpChars07'], PinBox) then
+                break;
+            if (i = 2) then
+              if not FindTextEx(x, y, ['SECOND'], ['UpChars07'], PinBox) then
+                break;
+            if (i = 3) then
+              if not FindTextEx(x, y, ['the TH', 'RD digit'], ['UpChars07'], PinBox) then
+                break;
+            if (i = 4) then
+              if not FindTextEx(x, y, ['FOURTH', 'Finally'], ['UpChars07'], PinBox) then
+                break;
+          until(WaitTTimer.TimeElapsed > 5000);
+        end else
+          if IsPinScreen(PinBox) then
+            continue
+          else
+          begin
+            writeln('Pin screen uptext not detected');
+            wait(randomrange(25, 175));
+            PressKey(27);
+            exit(false);
+          end;
+        case random(100) of
+          0..75   : wait(randomrange(450, 900));
+          76..95  : wait(randomrange(600, 1400));
+          96..100 : wait(randomrange(800, 1800));
+        end;
+        break;
+      end else
+        if a = high(ATPA) then
+        begin
+          wait(randomrange(500, 1200));
+          if WaitUpTextMulti(['Select', 'elec'], 300) then
+          begin
+            FastClick(MOUSE_LEFT);
+            WaitTTimer.start();
+            repeat
+              if (i = 1) then
+                if not FindTextEx(x, y, ['RST'], ['UpChars07'], PinBox) then
+                  break;
+              if (i = 2) then
+                if not FindTextEx(x, y, ['SECOND'], ['UpChars07'], PinBox) then
+                  break;
+              if (i = 3) then
+                if not FindTextEx(x, y, ['the TH', 'RD digit'], ['UpChars07'], PinBox) then
+                  break;
+              if (i = 4) then
+                if not FindTextEx(x, y, ['FOURTH', 'Finally'], ['UpChars07'], PinBox) then
+                  break;
+            until(WaitTTimer.TimeElapsed > 5000);
+            end else
+            if IsPinScreen(PinBox) then
+              continue
+            else
+            begin
+              writeln('Pin screen uptext not detected');
+              wait(randomrange(25, 175));
+              PressKey(27);
+              exit(false);
+            end;
+          case random(100) of
+            0..75   : wait(randomrange(450, 900));
+            76..95  : wait(randomrange(600, 1400));
+            96..100 : wait(randomrange(800, 1800));
+          end;
+          break;
+        end;
+    end;
+  end;
+  WaitTTimer.Start();
+  While isPinScreen(PinBox) do
+  begin
+    wait(100);
+    if (WaitTTimer.TimeElapsed > 5000) then
+    begin
+      writelN('Exceeded 5 seconds after pin input.');
+      PressKey(27);
+      exit(false);
+    end;
+    if FindTextEx(x, y, ['That number was incorrect', 'number was incorrec'], ['SmallChars07'], GetChatBox) then
+    begin
+      writelN('Incorrect pin entered.');
+      wait(randomrange(2000, 4000));
+      exit(false);
+    end;
+  end;
+  result := true;
+end;

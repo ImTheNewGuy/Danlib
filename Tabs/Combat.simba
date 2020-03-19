@@ -1,0 +1,106 @@
+function getSpecialAttackBox:Tbox;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetMenuBox('Combat');
+  Result := ToBox((TempBox.X1+45), (TempBox.Y1+242), (TempBox.X1+194), (TempBox.Y1+267));
+end;
+
+function enableSpecialAttackEx(SwitchBack: Boolean=false; UseOrb:boolean): Boolean;
+var
+  cTab : string;
+  gCol, OrbCol : TColEx;
+  ClickBox:tbox;
+begin
+  if UseOrb then
+  begin
+    OrbCol.create(8546579, 19, 0.05, 1.24);
+    ClickBox := toBox(GetMSDimensions.x2-153, 146, GetMSDimensions.x2-129, 164);
+    if not OrbCol.FindIn(ClickBox) then exit(false);
+    MissMouse(randPointInBox(ClickBox), 0, 0);
+    if WaitUpTextMulti(['Use Special Attack', 'Special Attack','Special'], 200) then
+    begin
+      FastClick(MOUSE_LEFT);
+      exit(true);
+    end;
+  end;
+  cTab := getActiveTab();
+  gCol.create(4427074, 15);
+  ChangeTab('Combat');
+  wait(randomRange(150,380));
+  result := gCol.findIn(getSpecialAttackBox);
+  if result then
+    if MouseInBox((getSpecialAttackBox)) then
+      FastClick(MOUSE_LEFT)
+    else
+      mouseBox(getSpecialAttackBox, MOUSE_LEFT);
+  if SwitchBack then
+    ChangeTab(cTab);
+end;
+
+function getAutoRetaliateBox:Tbox;
+var
+  TempBox:Tbox;
+  w, h: integer;
+begin
+  GetClientDimensions(w, h);
+  result := ToBox((w-196), (h-145), (w-47), (h-102));
+end;
+
+function IsAutoRetaliateEnabled: boolean;
+var
+  ARCol:TColEx;
+begin
+  ChangeTab('Combat');
+  ARCol.Create(1908610, 8, 0.02, 0.10);
+  result := ARCol.FindIn(getAutoRetaliateBox);
+end;
+
+//enableAR = enable or disable auto retaliate (true/false)
+//waitEnabled = wait for the change to confirm (true/false)
+
+function toggleAutoRetaliate(enableAR, waitEnabled:boolean):boolean;
+var
+  WaitEnTimer: timer;
+begin
+  if enableAR then
+    if not IsAutoRetaliateEnabled then
+    begin
+      MissMouse(RandPointInBox(getAutoRetaliateBox), 0, 0);
+      wait(randomrange(25, 75));
+      FastClick(MOUSE_LEFT);
+      if waitEnabled then
+      begin
+        WaitEnTimer.start();
+        repeat
+          if IsAutoRetaliateEnabled then
+            exit(true);
+          if (waitEnTimer.TimeElapsed > 5000) then
+            exit(false);
+        until(IsAutoRetaliateEnabled);
+        exit(true);
+      end else
+        exit(true);
+    end else
+      exit(true);
+  if not enableAR then
+    if IsAutoRetaliateEnabled then
+    begin
+      MissMouse(RandPointInBox(getAutoRetaliateBox), 0, 0);
+      wait(randomrange(25, 75));
+      FastClick(MOUSE_LEFT);
+      if waitEnabled then
+      begin
+        WaitEnTimer.start();
+        repeat
+          if not IsAutoRetaliateEnabled then
+            exit(true);
+          if (waitEnTimer.TimeElapsed > 5000) then
+            exit(false);
+        until(not IsAutoRetaliateEnabled);
+        exit(true);
+      end else
+        exit(true);
+    end else
+      exit(true);
+end;

@@ -1,0 +1,111 @@
+const
+  Red     = 'Red';
+  Blue    = 'Blue';
+  Yellow  = 'Yellow';
+  Green   = 'Green';
+  NORTH   = 'N';
+  SOUTH   = 'S';
+  EAST    = 'E';
+  WEST    = 'W';
+  NE      = 'NE';
+  NW      = 'NW';
+  SE      = 'SE';
+  SW      = 'SW';
+  COMBAT  = 'Combat';
+  STATS   = 'Stats';
+  QUEST   = 'Quest';
+  INV     = 'Inv';
+  EQUIP   = 'Equip';
+  PRAYER  = 'Prayer';
+  MAGIC   = 'Magic';
+
+  CLAN    = 'Clan';
+  FRIENDS = 'Friends';
+  IGNORE  = 'Ignore';
+  LOGOUT  = 'Logout';
+  EMOTES  = 'Emotes';
+  MUSIC   = 'Music';
+
+  BANK_SWAP           = 'Swap';
+  BANK_INSERT         = 'Insert';
+  BANK_ITEM           = 'Item';
+  BANK_NOTE           = 'Note';
+  BANK_PLACEHOLDERS   = 'Placeholders';
+  BANK_SEARCH         = 'Search';
+  BANK_DepositInv     = 'Deposit Inv';
+  BANK_DepositEquip   = 'Deposit Equip';
+  BANK_Withdraw_X     = 'Withdraw-x';
+  BANK_Withdraw_All   = 'Withdraw-all';
+
+const
+  clBlack         = 0;
+  clWhite         = 16777215;
+  clRed           = 255;
+  clGreen         = 32768;
+  clBlue          = 16711680;
+  clYellow        = 65535;
+  clOrange        = 26367;
+  clAqua          = 16776960;
+  clPurple        = 8388736;
+  clTrade         = 8323199;
+  clTeal          = 8421376;
+  clGray          = 8421504;
+  clLime          = 65280;
+  clSilver        = 12632256;
+  clPink          = 11772650;
+  clFuchsia       = 16711935;
+  clNavy          = 8388608;
+  clMaroon        = 128;
+  clOutline_black = 65536;
+  clOutline_white = 16777215;
+
+const
+  MaxInt = High(Integer);
+
+const
+  MOUSE_MOVE = 3;
+  VK_ENTER = {$IFDEF LINUX}10{$ELSE}VK_RETURN{$ENDIF};
+
+var
+  MSBox:Tbox;
+  MSCPoint: TPoint;
+  ScriptName:string;
+  pp, ww, cc:string;
+  Checked, done:boolean;
+
+function GetMSDimensions: TBox;
+var
+  w, h:integer;
+begin
+  if (MSBox.x2 > 0) then
+    exit(MSBox);
+  GetClientDimensions(w, h);
+  Result := [0, 0, w, h];
+  if Result.X2 > 0 then
+    MSBox := Result;
+end;
+
+function GetMSCP:TPoint;
+var
+  w, h:integer;
+begin
+  if (MSCPoint.x > 0) then
+    exit(MSCPoint);
+  GetClientDimensions(w, h);
+  Result.X := Round(w/2);
+  Result.Y := Round(h/2);
+  if Result.x > 0 then
+    MSCPoint := Point(Result.x, result.y);
+end;
+
+function GetPlayerCP:tpoint;
+begin
+  result.x := round(GetMSDimensions.x2 * 0.508);
+  result.y := round(getMSDimensions.y2 * 0.50);
+end;
+
+begin
+  Checked := false;
+  done := false;
+end;
+

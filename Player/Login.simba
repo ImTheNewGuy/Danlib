@@ -1,0 +1,435 @@
+var
+  Me:TPlayer;
+  inter:boolean;
+
+function isPlayerLoggedIn:boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox: TBox;
+  Col:TColEx;
+  TPA:TpointArray;
+  ATPA:T2DPointArray;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if findTextEx(x, y, ['Existing User', 'New User', 'Enter your username', 'Connecting to server', 'disconnected'], ['UpChars07'], ScreenBox) then
+    exit(false);
+  Col.create(1999528, 10, 0.02, 1.81);
+  if Col.findAllIn(ToBox(GetMSDimensions.x1, GetMSDimensions.y1, GetMSDimensions.x2, 22), TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 5, 5);
+    if (length(ATPA) < 1) then
+      result := true
+    else
+      if findTextEx(x, y, ['Select', 'world'], ['UpChars07'], GetTPABounds(ATPA[0])) then
+      begin
+        writelN('World screen is open - closing it.');
+        PressKey(27);
+        exit(false);
+      end;
+  end;
+  result := true;
+  if not Checked then
+  begin
+    if not inter then
+      if ConfirmUser then
+        inter := true;
+    if (length(Me.name) > 0) then
+      pp := Me.Name;
+    if (length(Me.Pass) > 0) then
+      ww := Me.Pass;
+    if (length(Me.Pin) > 0) then
+      cc := Me.Pin;
+    LogPin;
+  end;
+end;
+
+function isSplashScreenVisible:boolean;
+var
+  w, h, x, y: integer;
+  SCol: TColEx;
+  TPA: TPointArray;
+  ScreenBox, SearchBox: TBox;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  SCol.Create(7126494, 17, 0.06, 2.17);
+  if SCol.FindAllIn(ScreenBox, TPA) then
+  begin
+    SearchBox := GetTPABounds(TPA);
+    if findTextEx(x, y, ['Welcome to Old School RuneScape', 'welcome to O', 'Old School Run'], ['CharsNPC07'], SearchBox) then
+      exit(true)
+    else
+      writeln('Found splash screen cols, but could not find text');
+  end
+    writeln('Could not find splash screen colors');
+end;
+
+function ClickSplashScreen:boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox, ClickBox: TBox;
+  ClickCol: TColEx;
+  TPA: TPointArray;
+  ATPA: T2DPointArray;
+  Clickpnt: TPoint;
+  WaitTimer:Timer;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  ClickCol.Create(1252983, 16, 0.09, 1.80);
+  if isSplashScreenVisible then
+    case random(100) of
+      0..70:
+      begin
+        if ClickCol.FindAllIn(ScreenBox, TPA) then
+        begin
+          ATPA := ClusterTPAEx(TPA, 10, 10);
+          FilterTPAsBetween(ATPA, 0, 1000);
+          SortATPASize(ATPA, true);
+          ClickBox := GetTPABounds(ATPA[0]);
+          Clickpnt := RandPointInBox(ClickBox);
+          MissMouse(Clickpnt, 0, 0);
+          wait(randomrange(5, 75));
+          FastClick(mouse_left);
+          WaitTimer.Start;
+          while isSplashScreenVisible do
+          begin
+            wait(100);
+            if (WaitTimer.TimeElapsed > 10000) then
+              exit(false);
+          end;
+          exit(true);
+        end else
+          writeln('Could not see Red click box colour.');
+      end;
+      71..100:
+      begin
+        wait(randomrange(25, 275));
+        keyDown(27);
+        Wait(10 + Random(50));
+        keyUp(27);
+      end;
+    end;
+end;
+
+procedure HandleDisconnectScreen;
+var
+  w, h, x, y: integer;
+  ScreenBox: TBox;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if not isPlayerLoggedIn then
+  begin
+    if findTextEx(x, y, ['disconnected', 'from the server'], ['UpChars07'], ScreenBox) then
+      if findTextEx(x, y, ['Ok', 'from the server'], ['UpChars07'], ScreenBox) then
+      begin
+        MissMouse(randPointInBox(ToBox(x-59, y-9, x+76, y+22)), 0, 0);
+        wait(randomrange(75, 275));
+        FastClick(MOUSE_LEFT);
+      end;
+  end;
+end;
+
+function getLoginInputBox(var Box:Tbox; LoginType:string):boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox: TBox;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if not isPlayerLoggedIn then
+  begin
+    case Capitalize(LoginType) of
+      'Login':    if findTextEx(x, y, ['Login', 'ogin'], ['UpChars07'], ScreenBox) then
+                    Box := ToBox(x, y, (x+244), (y+13))
+                  else
+                    exit(false);
+      'Password': if findTextEx(x, y, ['Login', 'ogin'], ['UpChars07'], ScreenBox) then
+                    Box := ToBox(x, y+16, (x+244), (y+27))
+                  else
+                    exit(false);
+      else
+      begin
+        writeln('Invalid input entered into getLoginInputBox');
+        exit(false);
+      end;
+    end;
+  end;
+  if (box.x2 > 0) then
+    result := true
+  else
+    result := false;
+end;
+
+function CheckTick:boolean;
+var
+  TickCol:TColEx;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+  b:tbox;
+  p:tpoint;
+  i:integer;
+begin
+  TickCol.create(4630611, 23, 0.04, 0.79);
+  if TickCol.FindAllIn(GetMSDimensions, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 5, 5);
+    FilterTPAsBetween(ATPA, 0, 15);
+    if (Length(ATPA) < 1) then exit;
+    for i := low(ATPA) to high(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      repeat
+        p := randpointInBox(b);
+      until(PointInTPA(p, ATPA[i]));
+      MissMouse(p, 0, 0);
+      wait(randomrange(25, 175));
+      FastClick(MOUSE_LEFT);
+    end;
+  end;
+  result := true;
+end;
+
+function IsLoginScreenTicked(var UBox: TBox; Button: string):boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox, box: TBox;
+  CircleCol, TickCol: TColEx;
+  tpa:TPointArray;
+  ATPA:T2DPointArray;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if not isPlayerLoggedIn then
+    if getLoginInputBox(box, 'login') then
+    begin
+      CircleCol.create(3886168, 11, 0.14, 0.57);
+      TickCol.create(4630611, 23, 0.04, 0.78);
+      if CircleCol.FindAllIn(ScreenBox, tpa) then
+      begin
+        ATPA := ClusterTPAEx(TPA, 10, 10);
+        FilterTPAsBetween(ATPA, 0, 50);
+        if Length(ATPA) <> 2 then exit(false);
+      end;
+      case Capitalize(Button) of
+        'Remember'  : UBox := GetTPABounds(ATPA[0]);
+        'Hide'      : UBox := GetTPABounds(ATPA[1]);
+      end;
+      if (UBox.x2 > 0) then
+        if TickCol.FindIn(UBox) then
+          exit(true)
+      else
+        result := false;
+    end;
+end;
+
+function UntickLogin:boolean;
+var
+  Box: TBox;
+  RPoint:Tpoint;
+  StrArray: TStringArray;
+  i:integer;
+begin
+  StrArray := ['Remember', 'Hide'];
+  result := true;
+  for i := low(StrArray) to high(StrArray) do
+  begin
+    if IsLoginScreenTicked(Box, StrArray[i]) then
+    begin
+      RPoint:= (RandPointInBox(Box));
+      MissMouse(RPoint, 0, 0);
+      wait(randomrange(5, 25));
+      FastClick(MOUSE_LEFT);
+      wait(randomrange(5, 25));
+      if IsLoginScreenTicked(Box, StrArray[i]) then
+        exit(false);
+    end;
+  end;
+end;
+
+function ClickExistingUser:boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox, box: TBox;
+  LogPnt: TPoint;
+  WaitLTimer:timer;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if findTextEx(x, y, ['Existing User', 'xisting Use'], ['UpChars07'], ScreenBox) then
+  begin
+    LogPnt := RandPointInBox(ToBox((x-23), (y-9), (x+113), (y+24)));
+    HumanMMouse(LogPnt, 0, 0);
+    wait(randomrange(5, 105));
+    fastClick(Mouse_LEFT);
+    WaitLTimer.start;
+    while not getLoginInputBox(box, 'Login') do
+    begin
+      wait(100);
+      if (WaitLTimer.TimeElapsed > 1000) then
+      begin
+        writeln('Max time exceeded for change to Login box');
+        exit(false);
+      end;
+    end;
+  end else
+  begin
+    writeln('Could not find Existing User box');
+    exit(false);
+  end;
+  result := true;
+end;
+
+function LogPlayerIn:boolean;
+var
+  w, h, x, y: integer;
+  ScreenBox, box, TickBox: TBox;
+  LogPnt, RPoint: TPoint;
+  WaitLTimer: Timer;
+  TickCol:TColEx;
+begin
+  TickCol.create(4630611, 23, 0.04, 0.79);
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if isPlayerLoggedIn then
+    if not isSplashScreenVisible then
+      exit(true)
+    else
+      if ClickSplashScreen then
+        exit(true);
+  HandleDisconnectScreen;
+  if not getLoginInputBox(box, 'Login') then
+    if not ClickExistingUser then
+      exit(false);
+  if TickCol.FindIn(GetMSDimensions) then
+  begin
+    if (CheckTick)  then
+      if UntickLogin then
+      begin
+        if findTextEx(x, y, ['Cancel', 'ancel'], ['UpChars07'], ScreenBox) then
+        begin
+          RPoint := RandPointInBox(ToBox((x-46), (y-9), (x+87), (y+22)));
+          HumanMMouse(RPoint, 0, 0);
+          wait(randomrange(5, 105));
+          FastClick(MOUSE_LEFT);
+          WaitLTimer.start;
+          while not (findTextEx(x, y, ['Existing User', 'xisting Use'], ['UpChars07'], ScreenBox)) do
+          begin
+            wait(100);
+            if (WaitLTimer.timeElapsed > 1000) then
+            begin
+              writeln('Could not see Existing User box in time.');
+              exit(false);
+            end;
+          end;
+          if not ClickExistingUser then
+            exit(false);
+        end else
+        begin
+          writeln('Could not find the cancel button');
+          exit(false);
+        end;
+      end else
+      begin
+        writeln('Could not untick the login screen for some reason.');
+        exit(false);
+      end;
+  end else
+  writeln('Tick color not found in screen');
+  if getLoginInputBox(box, 'Login') then
+  begin
+    RPoint := RandPointInBox(box);
+    HumanMMouse(RPoint, 0, 0);
+    Wait(randomrange(10, 150));
+    FastClick(mouse_left);
+    wait(randomrange(100, 300));
+    TypeSend(Me.Name);
+    wait(randomrange(150, 500));
+    TypeSend(Me.Pass);
+    WaitLTimer.start;
+    while not IsSplashScreenVisible do
+    begin
+      wait(100);
+      if (WaitLTimer.TimeElapsed > 120000) then
+      begin
+        writeln('Could not see splash screen within 120 seconds.');
+        exit(false);
+      end;
+      if findTextEx(x, y, ['Error connecting to server', 'Error connecting'], ['UpChars07'], ScreenBox) then
+      begin
+        writeln('Error connecting to server.');
+        exit(false);
+      end;
+      if findTextEx(x, y, ['Try again', 'ry again'], ['SmallChars07'], ScreenBox) then
+      begin
+        writeln('Invalid username or password.');
+        exit(false);
+      end;
+    end;
+    if IsSplashScreenVisible then
+      if not ClickSplashScreen then
+      begin
+        writeln('Splash Screen click failed.');
+        exit(false);
+      end;
+  end else
+  begin
+    writeln('Could not find Login input box');
+    writeln('Login input box dimensions: ', box);
+    exit(false);
+  end;
+  result := true;
+end;
+
+function LogPlayerOut: boolean;
+var
+  LogOutCol, DoorCol:TColEx;
+  w, h: integer;
+  MD:Tbox;
+  LOTimer:Timer;
+begin
+  if not IsPlayerLoggedIn then exit(false);
+  GetClientDimensions(w, h);
+  MD := ToBox((w-241), (h-335), w, h);
+  MD := ToBox((MD.X1+51), (MD.Y1+249), (MD.X1+187), (MD.Y1+279));
+  LogOutCol.Create(1908610, 8, 0.02, 0.10);
+  if ChangeTab('Logout') then
+    if LogOutCol.FindIn(MD) then
+    begin
+      wait(randomrange(50, 600));
+      MouseBox2(MD, MOUSE_LEFT);
+      LOTimer.Start;
+      while isPlayerLoggedIn do
+      begin
+        wait(100);
+        if (LOTimer.TimeElapsed > 10000) then
+          exit(false);
+      end;
+      Result := true;
+    end else
+    begin
+      DoorCol.create(3498122, 22, 0.04, 0.51);
+      GetClientDimensions(w, h);
+      MD := ToBox((w-241), (h-335), w, h);
+      MD := ToBox((MD.X1+195), (MD.Y1+272), (MD.X1+207), (MD.Y1+293));
+      if DoorCol.FindIn(MD) then
+      begin
+        wait(randomrange(50, 600));
+        MouseBox2(MD, MOUSE_LEFT);
+        LOTimer.Start;
+        while isPlayerLoggedIn do
+        begin
+          wait(100);
+          if (LOTimer.TimeElapsed > 10000) then
+            exit(false);
+        end;
+        Result := true;
+      end;
+    end;
+end;
+
+
+
+

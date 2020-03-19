@@ -1,0 +1,45 @@
+Const
+  {$loadlib libsimpleocr}
+  DL_INCPATH = IncludePath+'Danlib';
+  {$DEFINE Danlib}
+  {$include_once Globals.simba}
+  {$include_once Definitions.simba}
+  {$include_once Text/Text.simba}
+  {$include_once Time/Time.simba}
+  {$include_once Utility/Utility.simba}
+  {$include_once Utility/Math.simba}
+  {$include_once Utility/AL_Functions.simba}
+  {$include_once Utility/Animation.simba}
+  {$include_once Utility/Color.simba}
+  {$include_once Input/InputHandler.simba}
+  {$include_once Minimap/Orbs.simba}
+  {$include_once Tabs/Tabs.simba}
+  {$include_once Utility/Debugging.simba}
+
+  {$include_once Tabs/Prayer.simba}
+  {$include_once Tabs/Equipment.simba}
+  {$include_once Tabs/Stats.simba}
+  {$include_once Chat/Chat.simba}
+  {$include_once Text/Uptext.simba}
+  {$include_once Tabs/Combat.simba}
+  {$include_once Text/Menu.simba}
+
+  {$include_once Bank/Bank.simba}
+  {$include_once Tabs/Inventory.simba}
+  {$include_once Tabs/Settings.simba}
+  {$include_once Antiban/Antiban.simba}
+  {$include_once Player/Login.simba}
+  {$include_once Runelite/Skilling.simba}
+  {$include_once Runelite/Combat.simba}
+  {$include_once Runelite/NMZ.simba}
+  {$include_once Utility/Objects.simba}
+  {$include_once Utility/Discord.simba}
+  {$include_once Player/WorldHandler.simba}
+
+
+
+
+
+
+
+

@@ -1,0 +1,154 @@
+const
+  Tabs := ['Combat', 'Stats', 'Quest', 'Inv', 'Equip', 'Prayer', 'Magic', 'Clan', 'Friends', 'Ignore', 'Logout', 'Settings', 'Emotes', 'Music'];
+
+var
+  MDB:Tbox;
+
+function GetMenuBox(MPanel:string): TBox;
+var
+  w, h: integer;
+  MD:Tbox;
+begin
+  GetClientDimensions(w, h);
+  MD := ToBox((w-241), (h-335), w, h);
+  case Capitalize(MPanel) of
+    'Combat'  : Result := ToBox(MD.x1, MD.Y1, (MD.X1+37), (MD.Y1+35));
+    'Stats'   : Result := ToBox((MD.X1+38), MD.Y1, (MD.X1+70), (MD.Y1+35));
+    'Quest'   : Result := ToBox((MD.X1+71), MD.Y1, (MD.X1+103), (MD.Y1+35));
+    'Inv'     : Result := ToBox((MD.X1+104), MD.Y1, (MD.X1+136), (MD.Y1+35));
+    'Equip'   : Result := ToBox((MD.X1+137), MD.Y1, (MD.X1+169), (MD.Y1+35));
+    'Prayer'  : Result := ToBox((MD.X1+170), MD.Y1, (MD.X1+202), (MD.Y1+35));
+    'Magic'   : Result := ToBox((MD.X1+203), MD.Y1, (MD.X1+235), (MD.Y1+35));
+
+    'Clan'    : Result := ToBox(MD.X1, (MD.Y2-37), (MD.X1+37), (MD.Y2-2));
+    'Friends' : Result := ToBox((MD.X1+38), (MD.Y2-37), (MD.X1+70), (MD.Y2-2));
+    'Ignore'  : Result := ToBox((MD.X1+71), (MD.Y2-37), (MD.X1+103), (MD.Y2-2));
+    'Logout'  : Result := ToBox((MD.X1+104), (MD.Y2-37), (MD.X1+136), (MD.Y2-2));
+    'Settings': Result := ToBox((MD.X1+137), (MD.Y2-37), (MD.X1+169), (MD.Y2-2));
+    'Emotes'  : Result := ToBox((MD.X1+170), (MD.Y2-37), (MD.X1+202), (MD.Y2-2));
+    'Music'   : Result := ToBox((MD.X1+203), (MD.Y2-37), (MD.X1+235), (MD.Y2-2));
+  end;
+end;
+
+function GetMenuDimensions:tbox;
+begin
+  if (MDB.x1 > 0) then
+    result := MDB
+  else
+    result := ToBox(GetMenuBox('Combat').x1, GetMenuBox('Combat').y1, GetMenuBox('Music').x2, GetMenuBox('Music').y2);
+end;
+
+function isTabActive(tab: string):boolean;
+var
+  TabCol: TColEx;
+begin
+  TabCol.Create(1317195, 12, 0.07, 0.23);
+  Result := TabCol.Findin(GetMenuBox(tab));
+end;
+
+function getActiveTab:string;
+var
+  i: integer;
+begin
+  for i := low(Tabs) to high(Tabs) do
+    if isTabActive(Tabs[i]) then
+      exit(Tabs[i]);
+  result := 'Bank';
+end;
+
+function waitIsTabActive(Tab: string; MaxWait: integer):boolean;
+var
+  WaitTime:Timer;
+begin
+  result := false;
+  if not IsTabActive(tab) then
+  begin
+    WaitTime.Start();
+    while (WaitTime.TimeElapsed < MaxWait) do
+      if isTabActive(tab) then
+        result := true;
+  end else
+    result := true;
+end;
+
+function ChangeTab(tab: string; dowait:boolean=true; miss:boolean=true):boolean;
+var
+  TempBox: Tbox;
+begin
+  if getActiveTab = 'Bank' then
+    if not waitIsTabActive(tab, 500) then
+      exit(false);
+  if not isTabActive(tab) then
+  begin
+    TempBox:= GetMenuBox(tab);
+    if miss then
+      MouseBox2(TempBox, MOUSE_LEFT)
+    else
+      Mousebox(TempBox, MOUSE_LEFT);
+    if dowait then
+      if waitIsTabActive(tab, 1000) then
+        result := true
+      else
+        result := false
+    else
+      result := true;
+  end else
+    result := true;
+end;
+
+// Uses F Keys to change tabs.
+// Only supports Combat, Inv, Prayer and Magic.
+function QuickChangeTab(tab: string; dowait:boolean=true):boolean;
+begin
+  if not isTabActive(tab) then
+  begin
+    case tab of
+      'Combat':PressKey(112); //F1
+      'Inv'   :PressKey(113); //F2
+      'Prayer':PressKey(114); //F3
+      'Magic' :PressKey(115); //F4
+      'Equip' :PressKey(116); //F5
+    end;
+    if dowait then
+      if waitIsTabActive(tab, 1000) then
+        result := true
+      else
+        result := false
+    else
+      result := true;
+  end else
+    result := true;
+end;
+
+
+{*
+ChangeTabRand
+~~~~~~~~~~~~
+
+.. code-block:: DanLib
+
+    ChangeTabRand(tab: string; MP:integer):boolean;
+
+Changes tab to desired tab using mouse and Fkeys randomly, based on percentage.
+Currently ony works for: Combat, Inventory, Prayer, Magic tabs.
+
+Example:
+
+    if ChangeTabRand('Inv', 25) then
+      writeln('25% chance we are going to use the mouse to change tabs');
+*}
+
+function ChangeTabRand(tab: string; MP:integer):boolean;
+var
+  TempBox: Tbox;
+begin
+  if (MP > 99) then
+    exit(false);
+  if not isTabActive(tab) then
+    case random(100) of
+      0..MP       : if ChangeTab(tab) then exit(true);
+      (MP+1)..100 : if QuickChangeTab(tab) then exit(true);
+    end;
+end;
+
+

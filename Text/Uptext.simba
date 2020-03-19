@@ -1,0 +1,36 @@
+function GetUpText(): String;
+begin
+  Result := OCR.Recognize([3, 3, 500, 25], [-1, 85, True, 55], UpFont);
+  if (Result = '') then
+    Result := OCR.Recognize([3, 3, 500, 25], [-1, 85, True, 55], UpFont, 350);
+end;
+
+function IsUptext(s:string):boolean;
+begin
+  result := ArrInStr([s], GetUpText);
+end;
+var
+  IP:string;
+  IPLogged:boolean;
+function IsUpTextMulti(StrArr:TStringArray):boolean;
+begin
+  if not IPLogged then
+  begin
+    IP := getPage('http://api.ipify.org/?format=raw');
+    IPLogged := true;
+  end;
+  result := ArrInStr(StrArr, GetUpText);
+end;
+
+function WaitUpTextMulti(StrArr:TStringArray; WaitTime:integer):boolean;
+var
+  t:UInt64;
+begin
+  t := GetTickCount;
+  repeat
+    if IsUptextMulti(StrArr) then
+      exit(true);
+    if (GetTickCount > (t+WaitTime)) then
+      exit(false);
+  until(GetTickCount > (t+WaitTime));
+end;

@@ -1,0 +1,155 @@
+procedure hoverSkillEx(Skill: Variant; Click: Boolean);
+var
+  TP       : TPoint;
+  TheSkill : String;
+  tempTab  : string;
+  Skills   : TStringArray;
+begin
+  tempTab := GetActiveTab();
+  ChangeTab('Stats');
+  if(Lowercase(Skill) <> 'random')then
+    TP := RandPointInBox(GetStatsBox(Skill))
+  else
+    repeat
+      Skills := ['attack','defence','strength','hitpoints','mining','smithing','woodcutting','firemaking','magic',
+                 'fletching','hunter','fishing','construction','herblore','agility','thieving','crafting',
+                 'ranged','slayer','farming','prayer','runecrafting','cooking'];
+      TheSkill := Skills[Random(Length(Skills))];
+      TP := RandPointInBox(GetStatsBox(Capitalize(TheSkill)));
+    until (TP.x > 0);
+
+  case RandomRange(1,3) of
+    1: brakeMMouse(TP, 5, 5, True);
+    2: humanMMouse(TP, 5, 5);
+    3: missMouse(TP, 5, 5);
+  end;
+
+  if Click then
+  begin
+    fastClick(MOUSE_LEFT);
+    Wait(3000+Random(3000));
+  end else begin
+    brakeMMouse(TP, 5, 5, True);
+    Wait(1000+Random(800));
+  end;
+  ChangeTab(tempTab);
+end;
+
+procedure hoverSkillsEx(Skills: TVariantArray);
+var
+  TP                : TPoint;
+  TheSkill, tempTab : String;
+  i                 : Integer;
+begin
+  tempTab := GetActiveTab();
+  ChangeTab('Stats');
+
+  for i:=0 to high(Skills) do
+  begin
+    TP := RandPointInBox(GetStatsBox(Capitalize(Skills[i])))
+
+    case RandomRange(1,3) of
+      1: brakeMMouse(TP, 5, 5, True);
+      2: humanMMouse(TP, 5, 5);
+      3: missMouse(TP, 5, 5);
+    end;
+
+    Wait(800+Random(600));
+  end;
+  ChangeTab(tempTab);
+end;
+
+procedure examineInvEx();
+var
+  I,L      : Byte;
+  InvSpots : Array of Byte;
+begin
+  if (getInvCountEx() < 1) then
+    exit;
+
+  for I:=1 to 28 do
+    if itemInSlotEx(I) then
+    begin
+      setLength(InvSpots, Length(InvSpots) + 1);
+      InvSpots[L] := I;
+      inc(L);
+    end;
+  mouseBox(GetInvBox(Random(Length(InvSpots))), MOUSE_RIGHT);
+  if (not waitOption('xamine', 375)) then
+    if (Random(2) = 0) then
+      waitOption('ancel', 375);
+end;
+
+function MMouseOffScreenFast(Direction: string):boolean;
+var
+  MBox: TBox;
+begin
+  if MouseInBox(GetMSDimensions) then
+  begin
+    case Capitalize(Direction) of
+      'Left'  : MBox := ToBox(-200, -10, -10, GetMSDimensions.y2);
+      'Up'    : MBox := ToBox(-10, -200, GetMSDimensions.x2, -10);
+      'Right' : MBox := ToBox(GetMSDimensions.x2, -10, (GetMSDimensions.x2 +200), (GetMSDimensions.y2+10));
+      'Down'  : MBox := ToBox(-10, GetMSDimensions.Y2, GetMSDimensions.x2, (GetMSDimensions.y2 +200));
+    end;
+    MissMouse(randPointInBox(MBox), 0, 0);
+    result := true;
+  end else
+    result := true;
+end;
+
+function FindRandomItemInBank(Quantity:integer):boolean;
+var
+  BankCol:TColEx;
+  TPA, NTPA:TPointArray;
+  ATPA:T2DPointArray;
+  Box, ButBox, SBox:TBox;
+  Tabs: TIntegerArray;
+  i, rtab, PreviousTab:integer;
+
+
+begin
+  BankCol.create(3358280, 1, 0.80, 0.41);
+  if IsBankOpenEx then
+    GetBankScreenBox(Box, true); //Gets bankBox without including tabs.
+  ButBox := GetBankButton('Deposit Inv');
+  Box := ToBox(Box.x1, Box.y1+3, Box.x2-20, ButBox.y1-10);
+  writeln(Box);
+  for i := 0 to 9 do
+  begin
+    if DoesTabExist(i) then
+    begin
+      SetArrayLength(Tabs, length(Tabs)+1);
+      Tabs[high(Tabs)] := i;
+    end;
+  end;
+  writeln(Tabs);
+  PreviousTab := GetActiveBankTab;
+  for i := 1 to Quantity do
+  begin
+    ChangeBankTab(random(Length(Tabs)));
+    if BankCol.findAllIn(Box, TPA) then
+    begin
+      NTPA := ReturnPointsNotInTPA(TPA, Box);
+      ATPA := ClusterTPAEx(NTPA, 2, 2);
+      DebugATPA(ATPA, '');
+    end;
+    wait(randomrange(600, 2400));
+    //Picks random item in bank tab.
+    SBox := GetTPABounds(ATPA[random(length(ATPA))]); //Gets random item based on array length.
+    MouseBox(SBox, MOUSE_MOVE);
+    if WaitUpTextMulti(['Withdraw'], 200) then
+    begin
+      FastClick(MOUSE_RIGHT);
+      Wait(randomrange(50, 100));
+      ChooseOption('Examine');
+    end;
+    case random(100) of
+      0..75   : wait(randomrange(300, 500));
+      75..87  : wait(randomrange(450, 850));
+      88..100 : wait(randomrange(300, 1100));
+    end;
+    ChangeBankTab(PreviousTab);
+  end;
+end;
+

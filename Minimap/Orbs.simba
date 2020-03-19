@@ -1,0 +1,272 @@
+var
+  MMBox:tbox;
+
+function GetMMBox:TBox;
+begin
+  if (MMBox.X1 < 1) then
+    result := IntToBox((GetMSDimensions.x2-158), 7, (GetMSDimensions.x2-7), 159)
+  else
+    result := MMBox;
+end;
+
+function GetMMCP:tpoint;
+var
+  x, y:integer;
+begin
+  x := round(GetMMBox.x2 - ((GetMMBox.x2-GetMMBox.x1)/2));
+  y := round(GetMMBox.y2 - ((GetMMBox.y2-GetMMBox.y1)/2));
+  result := point(x, y);
+end;
+
+function getXPBarAmountEx(): Integer;
+var
+  w, h: integer;
+begin
+  GetClientDimensions(w, h);
+  Result := -1;
+  Result := strToIntDef(ExtractFromStr(getTextAtEx(w-344, 5, w-255, 23, 0, 3, 1, 16777215, 5, 'StatChars07'), Numbers), -1);
+end;
+
+function XPBarOpenEx(): Boolean;
+begin
+  Result := getXPBarAmountEx() > -1;
+end;
+
+procedure toggleXPBarEx(Enable: Boolean; DoWait: Boolean=False);
+var
+  T : Timer;
+  TB: Tbox;
+begin
+  TB := GetMMBox;
+  if Enable then
+    if (not XPBarOpenEx) then
+      mouseBox(IntToBox((TB.X1-53),(TB.Y1+20),(TB.X1-27),(TB.Y1+46)), MOUSE_LEFT);
+
+  if (not Enable) then
+    if XPBarOpenEx then
+      mouseBox(IntToBox((TB.X1-53),(TB.Y1+20),(TB.X1-27),(TB.Y1+46)), MOUSE_LEFT);
+
+  if DoWait then
+  begin
+    T.Start();
+    while T.timeElapsed() < 4000 do
+    begin
+      if Enable then
+        if XPBarOpenEx then
+          exit;
+      if (not Enable) then
+        if (not XPBarOpenEx) then
+          exit;
+    end;
+  end;
+end;
+
+const
+  ORB_HP      := 'Hp';
+  ORB_Prayer  := 'Prayer';
+  ORB_RUN     := 'Run';
+  ORB_RUNICON := 'RunIcon';
+  ORB_SPECIAL := 'Special';
+
+function GetOrbBox(OrbType:string): TBox;
+var
+  w, h: integer;
+  MD: Tbox;
+begin
+  GetClientDimensions(w, h);
+  MD := IntToBox((w-203), 4, w, 165);
+  case Capitalize(OrbType) of
+    ORB_HP      : Result := IntToBox(MD.X1, 62, (MD.X2-188), 74);
+    ORB_Prayer  : Result := IntToBox(MD.X1, 96, (MD.X2-188), 107);
+    ORB_RUN     : Result := IntToBox((MD.X2-196), 128, (MD.X2-177), 140);
+    ORB_RUNICON : Result := IntToBox(GetMSDimensions.x2-175, 116, GetMSDimensions.X2-146, 145);
+    ORB_SPECIAL : Result := IntToBox((MD.X2-174), 153, (MD.X2-154), 164);
+  end;
+end;
+
+function GetOrbAmount(OrbType: string): integer;
+var
+  tpa : TPointArray;
+  OrbBox: TBox;
+begin
+  OrbBox := GetOrbBox(OrbType);
+  tpa    := returnTPAExceptColors([4938344, 0], [20, 0], OrbBox);
+  result := strToIntDef(getTextATPA(clusterTPAEx(tpa,1,10), 5, 'StatChars07'), 0);
+end;
+
+function isUsingQPEx(): Boolean;
+var
+  tCol : TColEx;
+  MD: TBox;
+  w, h:integer;
+begin
+  GetClientDimensions(w, h);
+  MD := IntToBox((w-203), 4, w, 165);
+  tCol.create(8869719, 38);
+  result := (tCol.count(IntToBox((MD.X2-186), 83, (MD.X2-158), 112)) > 40);
+end;
+
+function WaitIsUsingQPEx(TWait: integer): boolean;
+var
+  WaitTimer: Timer;
+begin
+  WaitTimer.Start();
+  while not isUsingQPEx do
+  begin
+    if (WaitTimer.TimeElapsed > TWait) then
+      exit(false);
+  end;
+  result := true;
+end;
+
+function toggleQPEx(Enable: Boolean): Boolean;
+var
+  TempBox:Tbox;
+  rp:TPoint;
+begin
+  TempBox := GetOrbBox('Prayer');
+  Result := False;
+  rp := RandPointInBox(IntToBox((TempBox.X1-5), (TempBox.Y1-3), (TempBox.X1+38), (TempBox.Y1+14)));
+  if Enable then
+  begin
+    if (GetOrbAmount('Prayer') = 0) then
+      exit(false);
+    if isUsingQPEx() then
+      exit(true)
+    else
+    begin
+      if not mouseInBox([(TempBox.X1-5), (TempBox.Y1-3), (TempBox.X1+38), (TempBox.Y1+14)]) then
+        MissMouse(rp, 0, 0);
+        //mouseBox(IntToBox((TempBox.X1-5), (TempBox.Y1-3), (TempBox.X1+38), (TempBox.Y1+14)), MOUSE_MOVE);
+      FastClick(MOUSE_LEFT);
+      exit(true);
+    end;
+  end else
+    if not Enable then
+      if WaitIsUsingQPEx(2000) then
+      begin
+        if not mouseInBox([(TempBox.X1-5), (TempBox.Y1-3), (TempBox.X1+38), (TempBox.Y1+14)]) then
+          MissMouse(rp, 0, 0);
+          //mouseBox(IntToBox((TempBox.X1-5), (TempBox.Y1-3), (TempBox.X1+38), (TempBox.Y1+14)), MOUSE_MOVE);
+        FastClick(MOUSE_LEFT);
+        Result := True;
+      end;
+end;
+
+function IsUsingRunEx():boolean;
+var
+  tCol : TColEx;
+begin
+  tCol.create(2403561, 27, 0.11, 0.70);
+  result := tCol.FindIn(ToBox(GetMSDimensions.x2-172, 118, GetMSDimensions.x2-148, 143));
+end;
+
+function WaitIsUsingRunEx(WaitT:integer):boolean;
+var
+  t:timer;
+begin
+  t.start();
+  while not IsUsingRunEx do
+    if (t.TimeElapsed > WaitT) then
+      exit(false);
+  result := true;
+end;
+
+function ToggleRun(enable:boolean):boolean;
+var
+  b:tbox;
+begin
+  b := ToBox(GetMSDimensions.x2-172, 118, GetMSDimensions.x2-148, 143);
+  if enable then
+  begin
+    if IsUsingRunEx then exit(true);
+    if not MouseInBox(b) then
+    begin
+      MissMouse(RandPointInBox(b), 0, 0);
+      wait(randomrange(25, 175));
+    end;
+    FastClick(MOUSE_LEFT);
+    if not WaitIsUsingRunEx(1000) then
+      exit(false)
+    else
+      exit(true);
+  end else
+  begin
+    if not IsUsingRunEx then exit(true);
+    if not MouseInBox(b) then
+    begin
+      MissMouse(RandPointInBox(b), 0, 0);
+      wait(randomrange(25, 175));
+    end;
+    FastClick(MOUSE_LEFT);
+    if WaitIsUsingRunEx(1000) then
+      exit(false)
+    else
+      exit(true);
+  end;
+end;
+
+const
+  ANGLE_HIGH  = 0;
+  ANGLE_LOW   = 1;
+
+procedure setAngleEx(Angle: Integer);
+begin
+  KeyDown((Angle * 2) + 38);
+  Sleep(2000 + Random(300));
+  KeyUp((Angle * 2) + 38);
+  Wait(500 + Random(100));
+end;
+
+{*******************************************************************************
+function getMiniMapDotsIn(WhatDot: String; x1, y1, x2, y2: Integer): TPointArray;
+By: euphemism, mormonman
+Description: Results the dots specified by WhatDot in the box x1, y1, x2, y2.
+Usage : 'npc', 'yellow', 'n', 'y' : Yellow Dot;
+        'cape', 'blue', 'team', 't', 'b' : Blue Dot;
+        'item', 'red', 'i', 'r' : Red Dot;
+        'player', 'white', 'p', 'w' : White Dot;
+        'friend', 'green', 'f', 'g' : Green Dot;
+*******************************************************************************}
+function getMiniMapDotsIn(WhatDot: String; Area: TBox): TPointArray;
+var
+  tCol     : TColEx;
+  I,Radius,
+  Hi,C,Dif : Integer;
+  TPA      : TPointArray;
+begin
+  case LowerCase(WhatDot) of
+    'npc', 'n', 'yellow', 'y': Dif := 4369;
+    'item', 'i', 'red', 'r': Dif := 50;
+    'player', 'p', 'white', 'w': Dif := 1907997;
+    'friend', 'f', 'green', 'g': Dif := 5376;
+    'team', 't', 'blue', 'b', 'cape': Dif := 2171941;
+    {'clan', 'c', 'orange', 'o': Dif := -1;}
+  else
+    writeln('"' + WhatDot + '" is not a valid dot type');
+  end;
+
+  tCol.create(65536, 0);
+  Freeze;
+  Radius := Max((Area.x2-Area.x1)div 2, (Area.y2-Area.y1)div 2);
+  tCol.findPie(Area, 0, 360, 0, radius, (Area.x1+Area.x2)div 2, (Area.y1+Area.y2)div 2, TPA);
+  Hi := High(TPA);
+  SetLength(Result, Hi + 1);
+  if (Hi < 0) then
+  begin
+    UnFreeze;
+    Exit;
+  end;
+  C := 0;
+  for I := 0 to Hi do
+  begin
+    if (getColor(TPA[I].X-1, TPA[I].Y-1) - getColor(TPA[I].X, TPA[I].Y-1) = Dif) then
+    begin
+      Result[C] := Point(TPA[I].x, TPA[i].y - 2);
+      Inc(C);
+    end;
+  end;
+  Unfreeze;
+  SetLength(Result, C);
+end;
+

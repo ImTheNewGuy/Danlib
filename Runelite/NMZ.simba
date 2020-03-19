@@ -1,0 +1,42 @@
+{ Still being tested }
+
+function GetAbsorbCount:integer;
+var
+  text:string;
+begin
+  text := GetTextAtEx(0, 0, 200, 400, 0, 5, 4, 65535, 1, 'SmallChars07');
+  if (Length(text) > 0) then
+    result := StrToInt(text)
+  else
+  begin
+    text := GetTextAtEx(0, 0, 200, 400, 0, 5, 4, 255, 1, 'SmallChars07');
+    if (Length(text) > 0) then
+      result := StrToInt(text)
+    else
+      result := 0;
+  end;
+end;
+
+function GetNMZPoints:integer;
+var
+  text:string;
+  FText:TStringArray;
+  x, y, i:integer;
+  b:tbox;
+begin
+  if findTextEx(x, y, ['Points'], ['SmallChars07'], ToBox(0, 0, 200, 400)) then
+  begin
+    b := ToBox(x+60, y-2, x+140, y+15);
+    text := GetTextAtEx(b.x1, b.y1, b.x2, b.y2, 0, 5, 4, 16777215, 1, 'SmallChars07');
+    for i:= low(text) to high(text) do
+    begin
+      if StrInArr(text[i], ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']) then
+      begin
+        SetLength(FText, Length(FText)+1);
+        FText[high(FText)] := text[i];
+      end;
+    end;
+    result := strToInt(Implode('', FText));
+  end;
+end;
+

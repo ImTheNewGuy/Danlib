@@ -1,0 +1,24 @@
+function isUptextMultiEx(Text: TStringArray): Boolean;
+begin
+  if not CheckedUser then
+    ConfirmUser;
+  ocr_SetClient(ClientATIA(4,3,500,16));
+  Result := ocr_IsTextMulti(Text, UpFont);
+end;
+
+function waitUpTextMultiEx(S: TStringArray; Time: Integer): Boolean;
+var
+  T : Timer;
+begin
+  if not CheckedUser then
+    ConfirmUser;
+  Result := false;
+  T.start();
+  while (T.timeElapsed < Time) do
+  begin
+    if (isUpTextMultiEx(S)) then
+      Exit(True);
+    Wait(10 + Random(20));
+  end;
+end;
+

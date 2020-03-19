@@ -1,0 +1,59 @@
+const
+  EQUIP_HEAD      := 'Head';
+  EQUIP_CAPE      := 'Cape';
+  EQUIP_NECK      := 'Neck';
+  EQUIP_QUIVER    := 'Quiver';
+  EQUIP_MAIN_HAND := 'Main Hand';
+  EQUIP_CHEST     := 'Chest';
+  EQUIP_OFF_HAND  := 'Off Hand';
+  EQUIP_LEGS      := 'Legs';
+  EQUIP_HANDS     := 'Hands';
+  EQUIP_FEET      := 'Feet';
+  EQUIP_RING      := 'Ring';
+  EquipSlots := [EQUIP_HEAD, EQUIP_CAPE, EQUIP_NECK, EQUIP_QUIVER, EQUIP_MAIN_HAND, EQUIP_CHEST, EQUIP_OFF_HAND, EQUIP_LEGS, EQUIP_HANDS, EQUIP_FEET, EQUIP_RING];
+
+function GetEquipBox(Piece: string): TBox;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetMenuBox('Combat');
+  case Capitalize(Piece) of
+    EQUIP_HEAD      : Result := ToBox((TempBox.X1+102), (TempBox.Y1+41), (TempBox.X1+137), (TempBox.Y1+76));
+    EQUIP_CAPE      : Result := ToBox((TempBox.X1+61), (TempBox.Y1+80), (TempBox.X1+96), (TempBox.Y1+115));
+    EQUIP_NECK      : Result := ToBox((TempBox.X1+102), (TempBox.Y1+80), (TempBox.X1+137), (TempBox.Y1+115));
+    EQUIP_QUIVER    : Result := ToBox((TempBox.X1+143), (TempBox.Y1+80), (TempBox.X1+178), (TempBox.Y1+115));
+    EQUIP_MAIN_HAND : Result := ToBox((TempBox.X1+46), (TempBox.Y1+119), (TempBox.X1+81), (TempBox.Y1+154));
+    EQUIP_CHEST     : Result := ToBox((TempBox.X1+102), (TempBox.Y1+119), (TempBox.X1+137), (TempBox.Y1+154));
+    EQUIP_OFF_HAND  : Result := ToBox((TempBox.X1+158), (TempBox.Y1+119), (TempBox.X1+193), (TempBox.Y1+154));
+    EQUIP_LEGS      : Result := ToBox((TempBox.X1+102), (TempBox.Y1+159), (TempBox.X1+137), (TempBox.Y1+194));
+    EQUIP_HANDS     : Result := ToBox((TempBox.X1+46), (TempBox.Y1+199), (TempBox.X1+81), (TempBox.Y1+234));
+    EQUIP_FEET      : Result := ToBox((TempBox.X1+102), (TempBox.Y1+199), (TempBox.X1+137), (TempBox.Y1+234));
+    EQUIP_RING      : Result := ToBox((TempBox.X1+158), (TempBox.Y1+199), (TempBox.X1+193), (TempBox.Y1+234));
+  end;
+end;
+
+function ItemEquipped(Piece: string):boolean;
+var
+  EquipCol:TColEx;
+begin
+  ChangeTab('Equip');
+  Equipcol.create(2304814, 1);
+  if not EquipCol.findIn(GetEquipBox(Piece)) then
+    exit(true)
+  else
+    exit(false);
+end;
+
+function ItemsEquipped:TStringArray;
+var
+  i:integer;
+begin
+  for i:= low(EquipSlots) to high(EquipSlots) do
+    if ItemEquipped(EquipSlots[i]) then
+    begin
+      setArrayLength(result, Length(result)+1);
+      result[High(result)] := EquipSlots[i];
+    end;
+end;
+
+

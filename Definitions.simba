@@ -1,0 +1,87 @@
+{
+===========
+Definitions
+===========
+}
+
+type
+  TPointerSet = record
+  isProc : Boolean;
+  proc   : procedure;
+  func   : function: Boolean;
+  name   : String;
+end;
+
+type TColEx = record
+  Col  : Integer;
+  Tol  : Integer;
+  hMod : Extended;
+  sMod : Extended;
+end;
+
+type TGraphics = record
+  Bmp    : TMufasaBitmap;
+  Init   : Boolean;
+  Width  : Integer;
+  Height : Integer;
+end;
+
+type TChatOption = record
+  Str    : String;
+  Bounds : TBox;
+end;
+
+type TOptions = record
+  Str    : String;
+  Bounds,
+  BigBox : TBox;
+end;
+
+type TInterface = record
+  Text       : String;
+  TxtBounds  : TBox;
+  FontType   : String;
+  FontColor,
+  ColorTol   : Integer;
+end;
+
+type TEntity = record
+  Bounds      : TBox;
+  BasePnt     : TPoint;
+  TopCol      : TColEx;
+  BottomCol   : TColEx;
+  FullTPA     : TPointArray;
+end;
+
+type TPlayer = record
+  Name      : string;
+  Pass      : string;
+  Nick      : string;
+  Pin       : string;
+  Member    : boolean;
+  WorldList : TIntegerArray;
+  Level     : array[0..24] of Integer;
+  Active    : boolean;
+  Model     : TEntity;
+  ModelSet  : boolean;
+  Status    : string;
+  Random    : string;
+  Worked    : Integer;
+  Booleans  : array of Boolean;
+  Integers  : TIntegerArray;
+  Strings   : array of string;
+  Extendeds : array of Extended;
+  Arrays    : array of TVariantArray;
+end;
+
+type DItem = record
+  Name      : string;
+  DTM       : integer;
+  BMP       : integer;
+  BMP_TOL   : integer;
+  Wieldable : boolean;
+  UpText    : TStringArray;
+end;
+
+Type
+  DItemArray = array of DItem;

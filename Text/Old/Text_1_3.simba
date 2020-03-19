@@ -1,0 +1,137 @@
+var
+  OCR: TSimpleOCR;
+  SmallFont, UpFont, NPCFont, StatFont: TFontSet;
+  bmp:Int32;
+  clientt:T2DIntArray;
+
+const
+  OCR_RULES_DEFAULT:TCompareRules = [-1,,,,50,False];
+  OCR_RULES_CHATBOX:TCompareRules = [-1,,,,-50,True];
+  OCR_RULES_BLUE:   TCompareRules = [16711680,10];     //navy blue
+  OCR_RULES_BLACK:  TCompareRules = [0,10];            //black
+  OCR_RULES_UPTEXT: TCompareRules = [13816530, 85, True, 85];
+
+var
+  Initiated:boolean;
+
+procedure InitFont;
+begin
+  if not Initiated then
+  begin
+    SmallFont.Load(FontPath+'SmallChars07');
+    UpFont.Load(FontPath+'UpChars07');
+    NPCFont.Load(FontPath+'CharsNPC07');
+    StatFont.Load(FontPath+'StatChars07');
+    Initiated := true;
+  end;
+end;
+
+// FontSetting - General purpose
+function FontSetting(color, tolerance:Int32=0; useShadow:Boolean=False;
+                     shadowMaxLight, threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  InitFont;
+  Result := [color,tolerance,useShadow,shadowMaxLight,threshold,threshInv];
+end;
+
+// FontSetting - Shadow
+function FontSettingShd(color:Int32=-1; tolerance:Int32=0; shadowMaxLight:Int32=0): TCompareRules;
+begin
+  InitFont;
+  Result := [color,tolerance,True,shadowMaxLight];
+end;
+
+// FontSetting - Threshold
+function FontSettingTrh(threshold:Int32=0; threshInv:Boolean=False): TCompareRules;
+begin
+  InitFont;
+  Result := [-1,0,False,0,threshold,threshInv];
+end;
+
+
+
+// override to keep up with simbas target
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; MaxWalk:Int32=40): String; override;
+begin
+  InitFont;
+  Self.ClientID := ExportImageTarget();
+  Result := Inherited(B, Filter, MaxWalk);
+end;
+
+
+// overloads which takes a fontset.
+function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet; MaxWalk:Int32=40): String; overload;
+begin
+  InitFont;
+  Self.SetFont(Font);
+  Result := Self.Recognize(B, Filter, MaxWalk);
+end;
+
+function TSimpleOCR.RecognizeEx(AClient:T2DIntArray; Filter:TCompareRules; Font:TFontSet): String; overload;
+begin
+  InitFont;
+  Self.SetFont(Font);
+  Result := Self.RecognizeEx(AClient, Filter);
+end;
+
+function TSimpleOCR.ExpectText(txt:String; B:TBox; font:TFontSet; setting:TCompareRules; maxWait:Int32=6000): Boolean;
+var
+  t:UInt32;
+begin
+  InitFont;
+  t := GetTimeRunning() + maxWait;
+  while GetTimeRunning() < t do
+  begin
+    Wait(Random(25, 75));
+    if Pos(txt, ocr.Recognize(B, setting, font)) <> 0 then
+      Exit(True);
+  end;
+end;
+
+function TSimpleOCR.SimpleRecognize(B: TBox; Color: Int32; Font: TFontSet; Expand: Int32 = 2): String;
+var
+  TPA: TPointArray;
+  tempCTS:integer;
+begin
+  InitFont;
+  TempCTS := GetToleranceSpeed;
+  SetColorToleranceSpeed(0);
+  FindColorsTolerance(TPA, Color, b.y1, b.x1, b.y2, b.x2, 255);
+  writeln(length(TPA));
+  if (length(TPA) > 0) then
+  begin
+    Self.SetFont(Font);
+    b := GetTPABounds(TPA);
+    b := [b.x1-expand, b.y1-expand, b.x2+expand, b.y2+expand];
+    Result := Self.Recognize(b, TCompareRules([Color]));
+      //Result := Self.Recognize(TPA.Bounds().Expand(Expand), TCompareRules([Color]));
+  end;
+  SetColorToleranceSpeed(TempCTS);
+  {if SRL.FindColors(TPA, CTS0(Color), B) > 0 then
+  begin
+    Self.SetFont(Font);
+
+    Result := Self.Recognize(TPA.Bounds().Expand(Expand), TCompareRules([Color]));
+  end;}
+end;
+
+{begin
+  SmallFont.Load(FontPath+'SmallChars07');
+  UpFont.Load(FontPath+'UpChars07');
+  NPCFont.Load(FontPath+'CharsNPC07');
+  StatFont.Load(FontPath+'StatChars07');
+
+  OCR.Init(UpFont); //just init it with W/E font.
+  //freeing OCR and fonts is handeled automatically by lape
+
+  repeat
+    //writeln(OCR.SimpleRecognize([2, 2, 500, 500], -1, UpFont, 1));
+    WriteLn('Example 1: '+OCR.Recognize(TBox([4,3,500,18]), FontSettingTrh));
+  until(GetTimeRunning > 5000);
+  OCR.Free;
+end.}
+
+
+
+
+

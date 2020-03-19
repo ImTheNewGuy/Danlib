@@ -1,0 +1,87 @@
+const
+  MenuDimension := ToBox(GetMSDimensions.x2-216, GetMSDimensions.y2-274, GetMSDimensions.x2-26, GetMSDimensions.y2-54);
+
+function WorldSelectMenu:boolean;
+var
+  LogOutCol, DoorCol, StarCol:TColEx;
+  t:timer;
+begin
+  LogOutCol.Create(1908610, 8, 0.02, 0.11);
+  StarCol.create(4705009, 10, 0.03, 0.99);
+  if ChangeTab('Logout') then
+    if LogOutCol.FindIn(MenuDimension) then
+    begin
+      wait(randomrange(75, 275));
+      MissMouse(randPointInBox(ToBox(GetMSDimensions.x2-189, GetMSDimensions.y2-131, GetMSDimensions.x2-56, GetMSDimensions.y2-109)), 0, 0);
+      if WaitUpTextMulti(['World Switcher', 'orld Swi'], 300) then
+      begin
+        wait(randomrange(75, 175));
+        FastClick(MOUSE_LEFT);
+        t.start();
+        while LogOUtCol.findIn(MenuDimension) do
+          if (t.TimeElapsed > 10000) then
+            exit(false);
+        t.start();
+        while not StarCol.findIn(MenuDimension) do
+          if (t.TimeElapsed > 10000) then
+            break;
+        exit(true);
+      end;
+    end else
+      exit(true);
+end;
+
+function ChangeWorld(World:integer; Members:boolean; CloseChanger:boolean=true):boolean;
+var
+  StarCol, LogOutCol:TColEx;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+  i, txtCol:integer;
+  b:tbox;
+  text:string;
+  t:timer;
+begin
+  if not WorldSelectMenu then exit(false);
+  if Members then
+  begin
+    StarCol.create(4705009, 10, 0.03, 0.99);
+    txtCol := 61680;
+  end else
+  begin
+    StarCol.create(11053224, 16, 0.01, 0.01);
+    txtCol := 14737632;
+  end;
+  if StarCol.findAllIn(MenuDimension, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 1, 1);
+    FilterTPAsBetween(ATPA, 0, 20);
+    for i := low(ATPA) to high(ATPA) do
+    begin
+      b := GetTPABounds(ATPA[i]);
+      b := ToBox(b.x1, b.y1, b.x2+100, b.y2);
+      text := Trim(getTextAtEx(b.x1, b.y1, b.x2, b.y2, 0, 5, 4, txtCol, 1, 'SmallChars07'));
+      writeln(text);
+      if IsArrInStr([IntToStr(World)], text) then
+      begin
+        Writeln('Changing worlds to: ', World);
+        MissMouse(randPointInBox(b), 0, 0);
+        wait(randomrange(75, 275));
+        FastClick(MOUSE_LEFT);
+        wait(randomrange(7000, 12000));
+        if CloseChanger then
+        begin
+          LogOutCol.Create(1908610, 8, 0.02, 0.11);
+          MissMouse(RandPointInBox(ToBox(GetMSDimensions.x2-46, GetMSDimensions.y2-295, GetMSDimensions.x2-31, GetMSDimensions.y2-279)), 0, 0);
+          wait(randomrange(75, 225));
+          FastClick(MOUSE_LEFT);
+          t.start();
+          while not LogOutCol.FindIn(MenuDimension) do
+            if (t.TimeElapsed > 5000) then
+              break;
+        end;
+        exit(true);
+      end;
+    end;
+  end else
+  writeln('Did not find col');
+end;

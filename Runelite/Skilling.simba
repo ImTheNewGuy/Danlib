@@ -1,0 +1,96 @@
+function FindRLIconBoxes:array of tbox;
+var
+  TPA:TpointArray;
+  ATPA:T2DPointArray;
+  b:tbox;
+  i:integer;
+  StrArr:tstringarray;
+  RLInfoBoxCol:TColEx;
+begin
+  RLInfoBoxCol.create(2569017, 6, 0.15, 0.94);
+  if RLInfoBoxCol.findAllIn(ToBox(1, 1, 300, round(GetMSDimensions.y2 / 2)), TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 1, 1);
+    if (length(ATPA) < 1) then exit;
+    for i := low(ATPA) to high(ATPA) do
+    begin
+      SetLength(result, length(result)+1);
+      result[high(result)] := GetTPABounds(ATPA[i]);
+    end;
+  end;
+end;
+
+function CheckIdle(Skill:string):boolean;
+var
+  text:string;
+  boxes:array of tbox;
+  i:integer;
+  uptext:TStringArray;
+begin
+  boxes := FindRLIconBoxes;
+  if (length(boxes) < 1) then exit;
+  case Capitalize(Skill) of
+    'Fishing'     :uptext := ['Fishing', 'Fish', 'Fi'];
+    'Woodcutting' :uptext := ['Woodcutting', 'Woodc'];
+    'Smelting'    :uptext := ['Smelting', 'Smelt'];
+    'Mining'      :uptext := ['Mining', 'Minin'];
+  end;
+  for i := low(boxes) to high(boxes) do
+    if IsArrInStr(uptext, GetTextAtEx(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, 0, 5, 4, 65280, 1, 'SmallChars07')) then
+      exit(true);
+end;
+
+function IsFishing:boolean;
+begin
+  result := CheckIdle('Fishing');
+end;
+
+function IsWoodcutting:boolean;
+begin
+  result := CheckIdle('Woodcutting');
+end;
+
+function IsSmelting:boolean;
+begin
+  result := CheckIdle('Smelting');
+end;
+
+function IsMining:boolean;
+begin
+  result := CheckIdle('Mining');
+end;
+
+// Requires Tile location to be enabled in developer tools. Reads the text that appears near curser when selecting a tile.
+function GetTileLocation:tpoint;
+var
+  s:string;
+  StrArr, Arr:TStringArray;
+  b:tbox;
+  TPA:TPointArray;
+  Col:TColEx;
+  x, y, i:integer;
+begin
+  Col.create(16777215, 1);
+  GetMousePos(x, y);
+  Col.findAllIn(ToBox(x, y, x+200, y+40), TPA);
+  if length(TPA) > 0 then
+  begin
+    b := GetTPABounds(TPA);
+    b := ExpandBox(b, 2);
+    s := getTextAtEx(b.x1, b.y1, b.x2, b.y2, 0, 5, 4, 16777215, 1, 'StatChars07');
+    writeln(S);
+    StrArr := Explode(' ', s);
+    if (length(StrArr) = 5) then
+    begin
+      // Variables are stored in slots 2 and 3 of the arr - [World, location, number, number, 0]
+      Arr := explode(',', StrArr[2]);
+      result.x := StrToIntDef(Arr[0], -1);
+      Arr := explode(',', StrArr[3]);
+      result.y := StrToIntDef(Arr[0], -1);
+    end;
+  end else
+    exit(Point(-1, -1));
+end;
+
+
+

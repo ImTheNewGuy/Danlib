@@ -1,0 +1,125 @@
+{*
+  Object finding
+  Interact    = Click on the object once we have found it = true/false
+  SearchBox   = The area that we will search for the object = Tbox
+  Uptext      = The uptext of the object when we verify it = TStringArray
+  OutlineType = NPC or Object (yellow or blue) = Outline_OBJECT or Outline_NPC
+  Col         = Main color = TColEx;
+  Col2        = Secondary color = TColEx - not required
+  Col3        = Third color = TColEx - not required
+  MinCount    = Minimum pixel count for combined colors = integer
+  MaxCount    = Maximum pixel count for combined colors = integer
+  PixelDist   = The max distance between pixels to be considered (ClusterTPAEx values) = integer
+  SortFromSize= Sort from biggest > smallerst. Will search from CP if set to false (default) - Boolean
+  Debug       = Debug the ATPA = boolean
+*}
+
+function FindObject(interact:boolean; SearchBox:TBox; UpText:TStringArray = ['']; UseOutline:boolean = true; Outline:TColEx = [0, 0, 0.00, 0.00]; Col:TColEx; Col2:TColEx = [0, 0, 0.00, 0.00]; Col3:TColEx = [0, 0, 0.00, 0.00]; MinCount:integer =0; MaxCount:integer = 10000; PixelDist:integer = 5; SortFromSize, Debug:boolean=false):boolean;
+var
+  TPA, CombinedTPA:TPointArray;
+  ATPA:T2DPointArray;
+  i:integer;
+  ObjectCol, ObjectCol2, ObjectCol3, OutlineCol:TColEx;
+  b:tbox;
+  p:tpoint;
+  boxes:array of tbox;
+  t:timer;
+begin
+  ObjectCol.create(Col.Col, Col.Tol, Col.hMod, Col.sMod);
+  if (Col2.Col > 0) then
+    ObjectCol2.create(Col2.Col, Col2.Tol, Col2.hMod, Col2.sMod);
+  if (Col3.Col > 0) then
+    ObjectCol3.create(Col3.Col, Col3.Tol, Col3.hMod, Col3.sMod);
+  if UseOutline then
+  begin
+    OutlineCol.create(Outline.Col, Outline.Tol, Outline.hMod, Outline.sMod);
+    if OutlineCol.findAllIn(SearchBox, TPA) then
+    begin
+      writeln('Outline color count: ', OutLineCol.count(SearchBox));
+      ATPA := ClusterTPAEx(TPA, 5, 5);
+      FilterTPAsBetween(ATPA, 0, 100);
+      SortATPAFrom(ATPA, GetMSCP);
+      for i := low(ATPA) to high(ATPA) do
+      begin
+        SetArrayLength(Boxes, length(boxes) + 1);
+        b := GetTPABounds(ATPA[i]);
+        Boxes[high(boxes)] := ToBox(b.x1+5, b.y1+5, b.x2-5, b.y2-5);
+      end;
+    end else
+    begin
+      if debug then
+        writeln('Failed to find outline col.');
+      Exit(false);
+    end;
+  end;
+  if ObjectCol.findAllIn(SearchBox, TPA) then
+  begin
+    if debug then
+      writeln('Col 1 count: ', ObjectCol.count(SearchBox));
+    if (ObjectCol2.Col > 0) then
+    begin
+      ObjectCol2.findAllIn(SearchBox, CombinedTPA);
+      TPA := CombineTPA(TPA, CombinedTPA);
+    end;
+    if (ObjectCol3.Col > 0) then
+    begin
+      ObjectCol3.findAllIn(SearchBox, CombinedTPA);
+      TPA := CombineTPA(TPA, CombinedTPA);
+    end;
+  end else
+  begin
+    if debug then
+      writeln('Could not find main object color.');
+    exit(false);
+  end;
+  if UseOutline then
+    TPA := FilterTPAsToBoxes(TPA, Boxes);
+  if debug then
+  begin
+    writeln('Boxes length: ', length(boxes));
+    writeln('TPA length after filtering to boxes: ', length(TPA));
+  end;
+  ATPA := ClusterTPAEX(TPA, PixelDist, PixelDist);
+  if debug then
+    DebugATPA(ATPA, '');
+  FilterTPAsBetween(ATPA, 0, MinCount);
+  FilterTPAsBetween(ATPA, MaxCount, 100000);
+  if SortFromSize then
+    SortATPASize(ATPA, true)
+  else
+    SortATPAFrom(ATPA, GetMSCP);
+  if (Length(ATPA) < 1) then
+  begin
+    if debug then
+      writeln('Found colors, but after filters the ATPA length was 0');
+    exit(false);
+  end;
+  if not interact then exit(true);
+  for i := low(ATPA) to high(ATPA) do
+  begin
+    t.start();
+    if not UseOutline then
+      b := GetTPABounds(ATPA[i]);
+    b := ToBox((b.x1+5), (b.y1+5), (b.x2-5), (b.y2-5));
+    repeat
+      p := RandPointInBox(b);
+      if (t.TimeElapsed > 5000) then break;
+    until(PointInTPA(p, ATPA[i]));
+    if (p.x < 2) then break;
+    MissMouse(p, 0, 0);
+    if WaitUpTextMulti(UpText, 200) then
+    begin
+      FastClick(MOUSE_LEFT);
+      exit(true);
+    end else
+    begin
+      FastClick(MOUSE_RIGHT);
+      if WaitOptionExistsMulti(Uptext, 200) then
+      begin
+        ChooseOptionMulti(UpText);
+        exit(true);
+      end;
+    end;
+  end;
+  writeln('Finished going through each obstacle but could not find a match');
+end;
