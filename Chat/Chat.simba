@@ -1,0 +1,114 @@
+var
+  CheckedUser:boolean=false;
+  ChatBox:tbox;
+  ActivePlayerName:string;
+
+function GetChatBox: TBox;
+var
+  w, h: integer;
+begin
+  if (ChatBox.x2 > 1) then
+    exit(ChatBox);
+  GetClientDimensions(w, h);
+  Result := ToBox(6, (H-159), 513, (H-29));
+  ChatBox := result;
+end;
+
+//Bottom line  = 8
+function GetChatBoxLine(LineNum: integer): TBox;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetChatBox;
+  case LineNum of
+    1: Result := ToBox(TempBox.X1, (TempBox.Y1), (TempBox.X2-17), (TempBox.Y1+15));
+    2: Result := ToBox(TempBox.X1, (TempBox.Y1+16), (TempBox.X2-17), (TempBox.Y1+29));
+    3: Result := ToBox(TempBox.X1, (TempBox.Y1+30), (TempBox.X2-17), (TempBox.Y1+43));
+    4: Result := ToBox(TempBox.X1, (TempBox.Y1+44), (TempBox.X2-17), (TempBox.Y1+57));
+    5: Result := ToBox(TempBox.X1, (TempBox.Y1+58), (TempBox.X2-17), (TempBox.Y1+71));
+    6: Result := ToBox(TempBox.X1, (TempBox.Y1+72), (TempBox.X2-17), (TempBox.Y1+85));
+    7: Result := ToBox(TempBox.X1, (TempBox.Y1+86), (TempBox.X2-17), (TempBox.Y1+99));
+    8: Result := ToBox(TempBox.X1, (TempBox.Y1+100), (TempBox.X2-17), (TempBox.Y1+113));
+    // Player Chat Box
+    9: Result := ToBox(TempBox.X1, (TempBox.Y1+114), (TempBox.X2-17), (TempBox.Y1+130));
+  end;
+end;
+
+function GetChatBoxTextEx(LineNum, textCol: integer): string;
+var
+  TempBox:Tbox;
+begin
+  TempBox := GetChatBoxLine(LineNum);
+  Result := Trim(getTextAtEx(TempBox.X1, TempBox.Y1, TempBox.X2, TempBox.Y2, 0, 5, 4, TextCol, 0, 'SmallChars07'));
+end;
+
+function findTextArrInCB(textArr:TstringArray; textCol:integer):boolean;
+var
+  i:integer;
+begin
+  for i := 1 to 8 do
+    if ArrInStr(textArr, GetChatBoxTextEx(i, textCol)) then
+      exit(true);
+end;
+
+function findTextArrInCBLines(textArr:TstringArray; textCol:integer; CBLines:TintegerArray):boolean;
+var
+  i:integer;
+begin
+  for i := low(CBLines) to high(CBLines) do
+    if ArrInStr(textArr, GetChatBoxTextEx(CBLines[i], textCol)) then
+      exit(true);
+end;
+
+function ClickedToContinue:boolean;
+var
+  Changetimer:timer;
+begin
+  if IsArrInStr(['Click', 'here to', 'to continue'], Trim(getTextAtEx(GetChatBox.X1, GetChatBox.Y1, GetChatBox.X2, GetChatBox.Y2, 0, 5, 4, 16711680, 1, 'CharsNPC07'))) then
+  begin
+    Presskey(32);
+    Changetimer.start;
+    while (Changetimer.TimeElapsed < randomrange(1800, 2200)) do
+      if IsArrInStr(['Click', 'here to', 'to continue'], Trim(getTextAtEx(GetChatBox.X1, GetChatBox.Y1, GetChatBox.X2, GetChatBox.Y2, 0, 5, 4, 16711680, 1, 'CharsNPC07'))) then
+      begin
+        PressKey(32);
+        Changetimer.start;
+      end;
+    result := true;
+  end;
+end;
+
+function LvlUp:boolean;
+begin
+  if IsArrInStr(['Congratulations', 'just advanced a'], Trim(getTextAtEx(GetChatBox.X1, GetChatBox.Y1, GetChatBox.X2, GetChatBox.Y2, 0, 5, 4, 8388608, 1, 'CharsNPC07'))) then
+    exit(true);
+end;
+
+var
+  AuthLink:string;
+
+function ConfirmUser:boolean;
+var
+  PlayerName:TStringArray;
+  x, y:integer;
+begin
+  Authlink := 'http://pastebin.com/raw/'+Auth;
+  PlayerName := explode(',', getPage(AuthLink));
+  if not ArrInStr(PlayerName, GetChatBoxTextEx(9, 0)) then
+  begin
+    writeln('Account not authorised.');
+    TerminateScript;
+  end;
+  if not StrInArr(ScriptName, PlayerName) then
+  begin
+    writeln('Script not authorised.');
+    TerminateScript;
+  end;
+  writeln('Authorised user: ', PlayerName);
+  TerminateScript;
+  CheckedUser := true;
+  ActivePlayerName := GetChatBoxTextEx(9, 0);
+  result := true;
+end;
+
+

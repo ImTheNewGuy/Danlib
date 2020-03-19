@@ -4,6 +4,7 @@ Const
   {$DEFINE Danlib}
   {$include_once Globals.simba}
   {$include_once Definitions.simba}
+  {$include_once Auth.simba}
   {$include_once Text/Text.simba}
   {$include_once Time/Time.simba}
   {$include_once Utility/Utility.simba}
