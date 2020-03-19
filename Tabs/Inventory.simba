@@ -582,7 +582,7 @@ var
   i:integer;
 begin
   if (GetInvCountEx = 28) then
-    exit([-1]);
+    exit;
   for i := 1 to 28 do
     if not ItemInSlot(i) then
     begin
