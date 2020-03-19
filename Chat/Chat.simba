@@ -104,8 +104,6 @@ begin
     writeln('Script not authorised.');
     TerminateScript;
   end;
-  writeln('Authorised user: ', PlayerName);
-  TerminateScript;
   CheckedUser := true;
   ActivePlayerName := GetChatBoxTextEx(9, 0);
   result := true;
