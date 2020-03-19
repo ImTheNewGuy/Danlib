@@ -1,7 +1,6 @@
 var
   CheckedUser:boolean=false;
   ChatBox:tbox;
-  ActivePlayerName:string;
 
 function GetChatBox: TBox;
 var

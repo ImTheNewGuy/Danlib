@@ -14,17 +14,15 @@ Const
   {$include_once Utility/Color.simba}
   {$include_once Input/InputHandler.simba}
   {$include_once Minimap/Orbs.simba}
-  {$include_once Tabs/Tabs.simba}
   {$include_once Utility/Debugging.simba}
-
+  {$include_once Chat/Chat.simba}
+  {$include_once Tabs/Tabs.simba}
   {$include_once Tabs/Prayer.simba}
   {$include_once Tabs/Equipment.simba}
-  {$include_once Tabs/Stats.simba}
-  {$include_once Chat/Chat.simba}
   {$include_once Text/Uptext.simba}
   {$include_once Tabs/Combat.simba}
+  {$include_once Tabs/Stats.simba}
   {$include_once Text/Menu.simba}
-
   {$include_once Bank/Bank.simba}
   {$include_once Tabs/Inventory.simba}
   {$include_once Tabs/Settings.simba}

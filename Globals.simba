@@ -72,6 +72,7 @@ var
   ScriptName:string;
   pp, ww, cc:string;
   Checked, done:boolean;
+  ActivePlayerName:string;
 
 function GetMSDimensions: TBox;
 var
