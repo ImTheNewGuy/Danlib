@@ -85,3 +85,6 @@ end;
 
 Type
   DItemArray = array of DItem;
+
+Type
+  TColsEx = array of TColEx;

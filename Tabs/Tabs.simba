@@ -123,11 +123,11 @@ begin
   if not isTabActive(tab) then
   begin
     case tab of
-      'Combat':PressKey(112); //F1
-      'Inv'   :PressKey(113); //F2
-      'Prayer':PressKey(114); //F3
-      'Magic' :PressKey(115); //F4
-      'Equip' :PressKey(116); //F5
+      'Combat':PressKey(FKey_Combat);
+      'Inv'   :PressKey(FKey_Inv);
+      'Prayer':PressKey(FKey_Prayer);
+      'Magic' :PressKey(FKey_Magic);
+      'Equip' :PressKey(FKey_Equip);
     end;
     if dowait then
       if waitIsTabActive(tab, 1000) then

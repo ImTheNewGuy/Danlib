@@ -93,6 +93,29 @@ begin
   setColorToleranceSpeed(tmpCTS);
 end;
 
+function TColsEx.findAllIn(Area: TBox; var Points: TPointArray): Boolean;
+var
+  tmpCTS, i: Integer;
+  TPA:TPointArray;
+begin
+  tmpCTS := getToleranceSpeed();
+  setColorToleranceSpeed(2);
+  checkAreaBounds(Area);
+  for i := low(self) to high(self) do
+  begin
+    setToleranceSpeed2Modifiers(Self[i].hMod, Self[i].sMod);
+    if findColorsTolerance(TPA, Self[i].Col, Area.X1, Area.Y1, Area.X2, Area.Y2, Self[i].Tol) then
+    begin
+      result := true;
+      if (length(Points) = 0) then
+        Points := TPA
+      else
+        Points := CombineTPA(TPA, Points);
+    end;
+  end;
+
+end;
+
 function TColEx.count(Area: TBox): Integer;
 var
   tmpCTS : Integer;

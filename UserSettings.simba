@@ -1,0 +1,16 @@
+const
+  {* FKeys setup *}
+  FKey_Combat  = F1;
+  FKey_Stats   = F6;
+  FKey_Quests  = F7;
+  FKey_Inv     = F2;
+  FKey_Equip   = F5;
+  FKey_Prayer  = F3;
+  FKey_Magic   = F4;
+  FKey_Clan    = F8;
+  FKey_Friends = F9;
+  FKey_Account = F10;
+  FKey_LogOut  = ESC;
+  FKey_Settings= F11;
+  FKey_Emotes  = F12;
+

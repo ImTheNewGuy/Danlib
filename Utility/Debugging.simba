@@ -132,6 +132,7 @@ var
   i    : Integer;
   atpa : T2DPointArray;
 begin
+  if (length(Boxes) < 1) then exit;
   setLength(atpa, length(Boxes));
   for i:=0 to high(Boxes) do
     atpa[i] := TPAFromBox(Boxes[i]);

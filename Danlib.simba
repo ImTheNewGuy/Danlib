@@ -3,6 +3,7 @@ Const
   DL_INCPATH = IncludePath+'Danlib';
   {$DEFINE Danlib}
   {$include_once Globals.simba}
+  {$include_once UserSettings.simba}
   {$include_once Definitions.simba}
   {$include_once Auth.simba}
   {$include_once Text/Text.simba}
