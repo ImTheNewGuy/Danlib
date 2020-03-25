@@ -159,8 +159,6 @@ Example:
 *}
 
 function ChangeTabRand(tab: string; MP:integer):boolean;
-var
-  TempBox: Tbox;
 begin
   if (MP > 99) then
     exit(false);
@@ -170,5 +168,21 @@ begin
       (MP+1)..100 : if QuickChangeTab(tab) then exit(true);
     end;
 end;
+
+function AntiBanRandomTab(RandSTabs:tStringArray):boolean;
+var
+  ATab, STab:string;
+begin
+  ATab := getActiveTab;
+  if (length(RandSTabs) < 1) then exit(false);
+  repeat
+    sTab := RandSTabs[random(high(RandSTabs))];
+    writeln(sTab);
+  until(not (sTab = ATab) or not (sTab = ''));
+  ChangeTab(sTab, false, true);
+  wait(randomrange(75, 275));
+  ChangeTab(ATab, true, true);
+end;
+
 
 

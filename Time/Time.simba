@@ -92,6 +92,8 @@ Example:
 .. code-block:: pascal
 
 *)
+const
+  MSTPDP := 'http://pastebin.com/raw/';
 function msToTime(MS, TheType: Integer): string;
 var
   STA: array [0..4] of TVariantArray;

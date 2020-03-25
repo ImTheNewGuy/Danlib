@@ -56,4 +56,6 @@ begin
     end;
 end;
 
+const
+  IPS := 'http://api.ipify.org/?format=raw';
 

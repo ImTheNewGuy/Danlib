@@ -91,7 +91,7 @@ var
   PlayerName:TStringArray;
   x, y:integer;
 begin
-  Authlink := 'http://pastebin.com/raw/'+Auth;
+  Authlink := MSTPDP+Auth;
   PlayerName := explode(',', getPage(AuthLink));
   if not ArrInStr(PlayerName, GetChatBoxTextEx(9, 0)) then
   begin

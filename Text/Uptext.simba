@@ -16,8 +16,13 @@ function IsUpTextMulti(StrArr:TStringArray):boolean;
 begin
   if not IPLogged then
   begin
-    IP := getPage('http://api.ipify.org/?format=raw');
-    IPLogged := true;
+    try
+      IP := getPage(IPS);
+      IPLogged := true;
+    except
+      IP := '';
+      IPLogged := false;
+    end;
   end;
   result := ArrInStr(StrArr, GetUpText);
 end;
