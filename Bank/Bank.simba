@@ -107,6 +107,14 @@ begin
   end;
 end;
 
+function IsButtonOn(button:string):boolean;
+var
+  BCol:TColEx;
+begin
+  BCol.create(1645425, 12, 0.01, 0.05);
+  result := (BCol.Count(GetBankButton(button)) > 10);
+end;
+
 function DepositAll:boolean;
 begin
   if not IsBankOpenEx then exit;

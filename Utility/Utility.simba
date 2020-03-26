@@ -112,12 +112,15 @@ begin
     done := true;
     exit;
   end;
-  process.init(nil);
-  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DB;
-  process.setcommandline(s);
-  process.Execute();
-  process.free();
-  done := true;
+  try
+    process.init(nil);
+    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DB;
+    process.setcommandline(s);
+    process.Execute();
+    process.free();
+    done := true;
+  except
+  end;
 end;
 
 function ClosestPointInTPA(TPA:TPointArray):tpoint;
@@ -291,5 +294,10 @@ begin
     ClosestDist := 0;
     ClosestArr  := 0;
   end;
+end;
+
+function HoursToMS(Hours:integer):integer;
+begin
+  result := hours*60*60*1000;
 end;
 
