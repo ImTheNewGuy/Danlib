@@ -1,0 +1,103 @@
+var
+  OSBArr:TStringArray;
+
+function GetOSBuddyPrice(ID:string; SellPrice:boolean=true):integer;
+var
+  Arr, SArr:TStringArray;
+  PriceIndex:string;
+  i, v:integer;
+begin
+  if (length(OSBArr) < 1) then
+  begin
+    try
+      Arr := explode(',', getPage('https://rsbuddy.com/exchange/summary.json'));
+      OSBArr := Arr;
+    except
+      writeln('Could not get data from OSBuddy data base');
+      exit;
+    end;
+  end else
+    Arr := OSBArr;
+  if SellPrice then
+    PriceIndex := '"sell_average"'
+  else
+    PriceIndex := '"buy_average"';
+  for i := low(Arr) to high(Arr) do
+  begin
+    if ArrInStr(['"id":'+ID], Arr[i]) then
+    begin
+      v := i;
+      repeat
+        if ArrInStr([PriceIndex], Arr[v]) then
+        begin
+          SArr := Explode(':', Arr[v]);
+          exit(StrToInt(SArr[high(SArr)]));
+        end;
+        inc(v);
+      until(ArrInStr(['"overall_quantity'], Arr[v]));
+      exit;
+    end;
+  end;
+end;
+
+function GetOSBuddyItemName(ID:string):string;
+var
+  Arr, SArr:TStringArray;
+  i, v:integer;
+begin
+  if (length(OSBArr) < 1) then
+  begin
+    try
+      Arr := explode(',', getPage('https://rsbuddy.com/exchange/summary.json'));
+      OSBArr := Arr;
+    except
+      writeln('Could not get data from OSBuddy data base');
+      exit;
+    end;
+  end else
+    Arr := OSBArr;
+  for i := low(Arr) to high(Arr) do
+  begin
+    if ArrInStr(['"id":'+ID], Arr[i]) then
+    begin
+      v := i;
+      repeat
+        if ArrInStr(['"name"'], Arr[v]) then
+        begin
+          SArr := Explode(':', Arr[v]);
+          exit(SArr[high(SArr)]);
+        end;
+        inc(v);
+      until(ArrInStr(['"overall_quantity'], Arr[v]));
+      exit;
+    end;
+  end;
+end;
+
+function GetOSBuddyID(ItemName:string):string;
+var
+  Arr, SArr:TStringArray;
+  i, v:integer;
+begin
+  if (length(OSBArr) < 1) then
+  begin
+    try
+      Arr := explode(',', getPage('https://rsbuddy.com/exchange/summary.json'));
+      OSBArr := Arr;
+    except
+      writeln('Could not get data from OSBuddy data base');
+      exit;
+    end;
+  end else
+    Arr := OSBArr;
+  for i := low(Arr) to high(Arr) do
+  begin
+    if ArrInStr(['"name":'+ItemName], Arr[i]) then
+    begin
+      SArr := Explode(':', Arr[i-1]);
+      exit(SArr[high(SArr)]);
+    end;
+  end;
+end;
+
+

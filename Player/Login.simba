@@ -73,7 +73,7 @@ var
   TPA: TPointArray;
   ATPA: T2DPointArray;
   Clickpnt: TPoint;
-  WaitTimer:Timer;
+  WaitTimer, t:Timer;
 begin
   GetClientDimensions(w, h);
   ScreenBox := [1, 1, w-1, h-1];
@@ -88,20 +88,35 @@ begin
           FilterTPAsBetween(ATPA, 0, 1000);
           SortATPASize(ATPA, true);
           ClickBox := GetTPABounds(ATPA[0]);
-          Clickpnt := RandPointInBox(ClickBox);
-          MissMouse(Clickpnt, 0, 0);
-          wait(randomrange(5, 75));
-          FastClick(mouse_left);
-          WaitTimer.Start;
-          while isSplashScreenVisible do
-          begin
-            wait(100);
-            if (WaitTimer.TimeElapsed > 10000) then
+          t.Start()
+          repeat
+            Clickpnt := RandPointInBox(ClickBox);
+            if not MouseInBox(ClickBox) then
+              MissMouse(Clickpnt, 0, 0);
+            wait(randomrange(5, 75));
+            FastClick(mouse_left);
+            WaitTimer.Start;
+            while isSplashScreenVisible do
+            begin
+              wait(100);
+              if (WaitTimer.TimeElapsed > 5000) then
+              begin
+                writeln('Exceeded 5000 seconds after clicking splash screen');
+                break;
+              end;
+            end;
+            if (t.TimeElapsed > 20000) then
+            begin
+              writeln('Took > 20 seconds for us to handle splash screen. Exiting.');
               exit(false);
-          end;
+            end;
+          until(not isSplashScreenVisible);
           exit(true);
         end else
-          writeln('Could not see Red click box colour.');
+          if IsPlayerLoggedIn then
+            exit(true)
+          else
+            writeln('Could not see Red click box colour and we arent logged in.');
       end;
       71..100:
       begin
@@ -109,6 +124,21 @@ begin
         keyDown(27);
         Wait(10 + Random(50));
         keyUp(27);
+        t.start();
+        WaitTimer.start();
+        while isSplashScreenVisible do
+        begin
+          if (t.TimeElapsed > 5000) then
+          begin
+            PressKey(27);
+            t.start();
+          end;
+          if (WaitTimer.TimeElapsed > 20000) then
+          begin
+            writeln('Took > 20 seconds for us to handle splash screen (esc). Exiting.');
+            exit(false);
+          end;
+        end;
       end;
     end;
 end;

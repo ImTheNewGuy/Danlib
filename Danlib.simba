@@ -35,6 +35,7 @@ Const
   {$include_once Utility/Objects.simba}
   {$include_once Utility/Discord.simba}
   {$include_once Player/WorldHandler.simba}
+  {$include_once Utility/OSBuddyAPI.simba}
 
 
 

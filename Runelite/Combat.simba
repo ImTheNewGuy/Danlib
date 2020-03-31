@@ -6,7 +6,7 @@ var
   boxes:array of tbox;
   GreenBarCol:TColEx;
 begin
-  GreenBarCol.create(2582535, 1, 0.01, 0.01);
+  GreenBarCol.create(2979592, 4, 0.02, 0.39);
   boxes := FindRLIconBoxes;
   for i := low(boxes) to high(boxes) do
     if GreenBarCol.FindIn(boxes[i]) then
