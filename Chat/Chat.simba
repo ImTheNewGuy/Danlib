@@ -1,6 +1,7 @@
 var
   CheckedUser:boolean=false;
   ChatBox:tbox;
+  PlayerName:TStringArray;
 
 function GetChatBox: TBox;
 var
@@ -88,7 +89,6 @@ var
 
 function ConfirmUser:boolean;
 var
-  PlayerName:TStringArray;
   x, y:integer;
 begin
   Authlink := MSTPDP+Auth;
