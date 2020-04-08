@@ -301,3 +301,12 @@ begin
   result := hours*60*60*1000;
 end;
 
+function MinutesToMS(Minutes:integer):integer;
+begin
+  result := Minutes*60*1000;
+end;
+
+function SecondsToMS(Seconds:integer):integer;
+begin
+  result := Seconds*1000;
+end;

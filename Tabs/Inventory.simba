@@ -466,7 +466,10 @@ begin
       else
         HumanMMouse(randPointInBox(GetInvBox(DropArr[i])), 0, 0);
       if not isKeyDown(VK_SHIFT) then
+      begin
         keyDown(VK_SHIFT);
+        wait(randomrange(125, 275));
+      end;
       FastClick(Mouse_LEFT);
       wait(randomrange(5, 75));
       if FCol.FindIn(GetInvBox(DropArr[i])) then
