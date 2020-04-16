@@ -680,3 +680,45 @@ begin
     keyUp(VK_SHIFT);
   result := true;
 end;
+
+function RandomiseIntArray(IntArray:TintegerArray): TIntegerArray;
+var
+  i     : Integer;
+  pnt   : TPoint;
+  Slots :TIntegerArray;
+begin
+  if (length(IntArray) < 1) then exit;
+  repeat
+    i := random(1, 28);
+    if IntInArray(i, IntArray) then
+      if not IntInArray(i, result) then
+      begin
+        setArrayLength(result, Length(result)+1);
+        result[High(result)] := i;
+      end;
+  until(length(result) = length(IntArray));
+end;
+
+function RandomiseIntArray(ArrLow, ArrHigh:integer): TIntegerArray; overload;
+var
+  i     : Integer;
+  pnt   : TPoint;
+  IntArray :TIntegerArray;
+begin
+  if (ArrHigh < 1) or (ArrHigh < ArrLow) then exit;
+  for i := ArrLow to ArrHigh do
+  begin
+    setArrayLength(IntArray, Length(IntArray)+1);
+    IntArray[High(IntArray)] := i;
+  end;
+  if (length(IntArray) < 1) then exit;
+  repeat
+    i := random(1, 28);
+    if IntInArray(i, IntArray) then
+      if not IntInArray(i, result) then
+      begin
+        setArrayLength(result, Length(result)+1);
+        result[High(result)] := i;
+      end;
+  until(length(result) = length(IntArray));
+end;

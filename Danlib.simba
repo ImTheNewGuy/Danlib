@@ -27,7 +27,7 @@ Const
   {$include_once Bank/Bank.simba}
   {$include_once Tabs/Inventory.simba}
   {$include_once Tabs/Settings.simba}
-  {$include_once Antiban/Antiban.simba}
+
   {$include_once Player/Login.simba}
   {$include_once Runelite/Skilling.simba}
   {$include_once Runelite/Combat.simba}
@@ -36,6 +36,7 @@ Const
   {$include_once Utility/Discord.simba}
   {$include_once Player/WorldHandler.simba}
   {$include_once Utility/OSBuddyAPI.simba}
+  {$include_once Antiban/Antiban.simba}
 
 
 
