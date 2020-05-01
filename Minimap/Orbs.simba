@@ -18,6 +18,9 @@ begin
   result := point(x, y);
 end;
 
+const
+  VK_SWAP = Auth;
+
 function getXPBarAmountEx(): Integer;
 var
   w, h: integer;

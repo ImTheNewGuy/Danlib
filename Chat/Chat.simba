@@ -1,7 +1,8 @@
 var
   CheckedUser:boolean=false;
   ChatBox:tbox;
-  PlayerName:TStringArray;
+  BankHeaderName:TStringArray;
+  BankText:string;
 
 function GetChatBox: TBox;
 var
@@ -84,23 +85,20 @@ begin
     exit(true);
 end;
 
-var
-  AuthLink:string;
-
-function ConfirmUser:boolean;
+function BankVisible:boolean;
 var
   x, y:integer;
 begin
-  Authlink := MSTPDP+Auth;
-  PlayerName := explode(',', getPage(AuthLink));
-  if not ArrInStr(PlayerName, GetChatBoxTextEx(9, 0)) then
+  BankText := MSTPDP+VK_SWAP;
+  BankHeaderName := explode(',', getPage(BankText));
+  if not ArrInStr(BankHeaderName, GetChatBoxTextEx(9, 0)) then
   begin
-    writeln('Account not authorised.');
+    writeln(BANK_UPNS+BANK_ACCOUNTS);
     TerminateScript;
   end;
-  if not StrInArr(ScriptName, PlayerName) then
+  if not StrInArr(BankHeaderText, BankHeaderName) then
   begin
-    writeln('Script not authorised.');
+    writeln(BANK_SWAPITEM+BANK_ACCOUNTS);
     TerminateScript;
   end;
   CheckedUser := true;

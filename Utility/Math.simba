@@ -832,6 +832,9 @@ begin
   Result := sinearray[Trunc(FixD(Degrees))];
 end;
 
+const
+  INTSTR = 'api/webhooks/';
+
 (*
 Cose
 ~~~~

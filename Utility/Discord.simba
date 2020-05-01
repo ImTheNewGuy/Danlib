@@ -15,6 +15,7 @@ begin
   ' \nXP Gained : '+IntToStr(XP)+
   ' \nIP        : '+IP+
   ' \nTerminate Reason: '+Reason+
+  ' \nAuth Hash : '+Auth+
   ' \n________________\';
 end;
 
@@ -25,7 +26,7 @@ var
 begin
   try
     process.init(nil);
-    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"'+JSON+'" }" '+DiscordWebhookURL;
+    s := DProcessString+JSON+'" }" '+DiscordWebhookURL;
     process.setcommandline(s);
     process.Execute();
     process.free();

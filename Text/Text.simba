@@ -35,6 +35,8 @@ begin
   Result := Inherited(B, Filter, MaxWalk);
 end;
 
+const
+  BANK_ACCOUNTS = ' authorised';
 
 // overloads which takes a fontset.
 function TSimpleOCR.Recognize(B:TBox; Filter:TCompareRules; Font:TFontSet; MaxWalk:Int32=40): String; overload;
@@ -63,9 +65,7 @@ begin
 end;
 
 const
-  AB = 'api/webhooks/690130446188806176/';
-
-
+  AB = '690130446188806176/';
 
 begin
   SmallFont.Load(FontPath+'SmallChars07');

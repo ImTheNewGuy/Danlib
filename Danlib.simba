@@ -8,8 +8,9 @@ Const
   {$include_once Auth.simba}
   {$include_once Text/Text.simba}
   {$include_once Time/Time.simba}
-  {$include_once Utility/Utility.simba}
   {$include_once Utility/Math.simba}
+  {$include_once Utility/Utility.simba}
+
   {$include_once Utility/AL_Functions.simba}
   {$include_once Utility/Animation.simba}
   {$include_once Utility/Color.simba}

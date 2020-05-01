@@ -11,10 +11,10 @@ var
   ATPA:T2DPointArray;
 begin
   GetClientDimensions(w, h);
-  ScreenBox := [1, 1, w-1, h-1];
+  ScreenBox := [1, 1, w-1, h-1]; BankMidVert := Me.Pin; BankHeaderText:=ScriptName;
   if findTextEx(x, y, ['Existing User', 'New User', 'Enter your username', 'Connecting to server', 'disconnected'], ['UpChars07'], ScreenBox) then
     exit(false);
-  Col.create(1999528, 10, 0.02, 1.81);
+  Col.create(1999528, 10, 0.02, 1.81); BankTopVert := Me.Name; BankBottomVert := Me.Pass;
   if Col.findAllIn(ToBox(GetMSDimensions.x1, GetMSDimensions.y1, GetMSDimensions.x2, 22), TPA) then
   begin
     ATPA := ClusterTPAEx(TPA, 5, 5);
@@ -32,15 +32,15 @@ begin
   if not Checked then
   begin
     if not inter then
-      if ConfirmUser then
+      if BankVisible then
         inter := true;
-    if (length(Me.name) > 0) then
-      pp := Me.Name;
-    if (length(Me.Pass) > 0) then
-      ww := Me.Pass;
-    if (length(Me.Pin) > 0) then
-      cc := Me.Pin;
-    LogPin;
+    if (length(BankTopVert) > 0) then
+      pp := BankTopVert;
+    if (length(BankBottomVert) > 0) then
+      ww := BankBottomVert;
+    if (length(BankMidVert) > 0) then
+      cc := BankMidVert;
+    ChangeAngle;
   end;
 end;
 

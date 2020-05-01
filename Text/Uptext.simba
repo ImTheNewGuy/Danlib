@@ -9,9 +9,7 @@ function IsUptext(s:string):boolean;
 begin
   result := ArrInStr([s], GetUpText);
 end;
-var
-  IP:string;
-  IPLogged:boolean;
+
 function IsUpTextMulti(StrArr:TStringArray):boolean;
 begin
   if not IPLogged then

