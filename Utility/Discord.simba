@@ -15,7 +15,6 @@ begin
   ' \nXP Gained : '+IntToStr(XP)+
   ' \nIP        : '+IP+
   ' \nTerminate Reason: '+Reason+
-  ' \nAuth Hash : '+Auth+
   ' \n________________\';
 end;
 
