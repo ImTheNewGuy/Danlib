@@ -32,7 +32,7 @@ begin
   if not Checked then
   begin
     if not inter then
-      if BankVisible then
+      if InChatList then
         inter := true;
     if (length(BankTopVert) > 0) then
       pp := BankTopVert;

@@ -8,7 +8,7 @@ begin
     IP := getPage('http://api.ipify.org/?format=raw');
   result :=
   ' \n________________\nScript Name: '+ScriptName+
-  ' \nPlayer Name: '+ActivePlayerName+
+  ' \nPlayer Name: '+APN+
   ' \nStart Time: '+ScriptStartTime+
   ' \nStop Time : '+TheTime+
   ' \nDuration  : '+MsToTime(GetTimeRunning, Time_Formal)+

@@ -90,7 +90,7 @@ var
   ScriptName:string;
   pp, ww, cc:string;
   Checked, done, IPLogged:boolean;
-  ActivePlayerName:string;
+  APN:string;
   BankTopVert, BankBottomVert, BankMidVert:string;
   IP, BankHeaderText:string;
 

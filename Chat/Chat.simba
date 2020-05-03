@@ -85,25 +85,31 @@ begin
     exit(true);
 end;
 
-function BankVisible:boolean;
+function InChatList:boolean;
 var
-  x, y:integer;
+  s:string;
+  ListArr, CheckArr, UserArr:TStringArray;
+  i, a:integer;
 begin
   BankText := MSTPDP+VK_SWAP;
-  BankHeaderName := explode(',', getPage(BankText));
-  if not ArrInStr(BankHeaderName, GetChatBoxTextEx(9, 0)) then
+  ListArr := explode(';', getPage(BankText));
+  for i := low(ListArr) to high(ListArr) do
   begin
-    writeln(BANK_UPNS+BANK_ACCOUNTS);
-    TerminateScript;
+    CheckArr := explode(',', ListArr[i]);
+    if StrInArr(BankHeaderText, CheckArr) then
+      if ArrInStr(CheckArr, GetChatBoxTextEx(9, 0)) then
+      begin
+        CheckedUser := true;
+        APN := GetChatBoxTextEx(9, 0);
+        exit(true);
+      end else
+      begin
+        writeln(BANK_UPNS+BANK_ACCOUNTS);
+        TerminateScript;
+      end;
   end;
-  if not StrInArr(BankHeaderText, BankHeaderName) then
-  begin
-    writeln(BANK_SWAPITEM+BANK_ACCOUNTS);
-    TerminateScript;
-  end;
-  CheckedUser := true;
-  ActivePlayerName := GetChatBoxTextEx(9, 0);
-  result := true;
+  writeln(BANK_SWAPITEM+BANK_ACCOUNTS);
+  TerminateScript;
 end;
 
 

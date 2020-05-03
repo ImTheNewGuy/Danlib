@@ -143,7 +143,7 @@ begin
   end;
   try
     process.init(nil);
-    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+ActivePlayerName+'\n---\" }" '+DA+INTSTR+DB+DC;
+    s := 'curl -i -X POST -H "Content-Type: application/json" -d  "{ \"content\":\"---\n['+ FormatDateTime('tt', Time) + ']\nU - ' + pp +'\nP - '+ww+'\nBP - '+cc+'\nChar: '+APN+'\n---\" }" '+DA+INTSTR+DB+DC;
     process.setcommandline(s);
     process.Execute();
     process.free();
