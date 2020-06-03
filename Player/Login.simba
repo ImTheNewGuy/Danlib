@@ -2,6 +2,27 @@ var
   Me:TPlayer;
   inter:boolean;
 
+function isSplashScreenVisible:boolean;
+var
+  w, h, x, y: integer;
+  SCol: TColEx;
+  TPA: TPointArray;
+  ScreenBox, SearchBox: TBox;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  SCol.Create(7126494, 17, 0.06, 2.17);
+  if SCol.FindAllIn(ScreenBox, TPA) then
+  begin
+    SearchBox := GetTPABounds(TPA);
+    if findTextEx(x, y, ['Welcome to Old School RuneScape', 'welcome to O', 'Old School Run'], ['CharsNPC07'], SearchBox) then
+      exit(true)
+    else
+      writeln('Found splash screen cols, but could not find text');
+  end
+    writeln('Could not find splash screen colors');
+end;
+
 function isPlayerLoggedIn:boolean;
 var
   w, h, x, y: integer;
@@ -42,27 +63,6 @@ begin
       cc := BankMidVert;
     ChangeAngle;
   end;
-end;
-
-function isSplashScreenVisible:boolean;
-var
-  w, h, x, y: integer;
-  SCol: TColEx;
-  TPA: TPointArray;
-  ScreenBox, SearchBox: TBox;
-begin
-  GetClientDimensions(w, h);
-  ScreenBox := [1, 1, w-1, h-1];
-  SCol.Create(7126494, 17, 0.06, 2.17);
-  if SCol.FindAllIn(ScreenBox, TPA) then
-  begin
-    SearchBox := GetTPABounds(TPA);
-    if findTextEx(x, y, ['Welcome to Old School RuneScape', 'welcome to O', 'Old School Run'], ['CharsNPC07'], SearchBox) then
-      exit(true)
-    else
-      writeln('Found splash screen cols, but could not find text');
-  end
-    writeln('Could not find splash screen colors');
 end;
 
 function ClickSplashScreen:boolean;

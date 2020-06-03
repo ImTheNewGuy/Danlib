@@ -122,6 +122,9 @@ begin
     MSCPoint := Point(Result.x, result.y);
 end;
 
+const
+  MSCBox := IntToBox(GetMSCP.x-50, GetMSCP.y-50, GetMSCP.x+50, GetMSCP.y+50);
+
 function GetPlayerCP:tpoint;
 begin
   result.x := round(GetMSDimensions.x2 * 0.508);

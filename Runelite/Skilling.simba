@@ -7,11 +7,13 @@ var
   StrArr:tstringarray;
   RLInfoBoxCol:TColEx;
 begin
-  RLInfoBoxCol.create(2569017, 6, 0.15, 0.94);
+  RLInfoBoxCol.create(2768973, 6, 0.53, 2.66);
   if RLInfoBoxCol.findAllIn(ToBox(1, 1, 300, round(GetMSDimensions.y2 / 2)), TPA) then
   begin
     ATPA := ClusterTPAEx(TPA, 1, 1);
+    FilterTPAsBetween(ATPA, 0, 20);
     if (length(ATPA) < 1) then exit;
+    SortATPASize(ATPA, true);
     for i := low(ATPA) to high(ATPA) do
     begin
       SetLength(result, length(result)+1);

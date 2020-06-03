@@ -1,0 +1,35 @@
+Const
+  HOP_UP = 0;
+  HOP_DOWN= 1;
+
+function QuickHopWorld(Dir:integer):boolean;
+var
+  t:timer;
+begin
+  KeyDown(VK_CONTROL);
+  wait(randomrange(5, 65));
+  KeyDown(VK_SHIFT);
+  wait(randomrange(5, 175));
+  case Dir of
+    HOP_UP : KeyDown(VK_LEFT);
+    HOP_DOWN: KeyDown(VK_RIGHT);
+  end;
+  wait(randomrange(25, 75));
+ case Dir of
+    HOP_UP : KeyUp(VK_LEFT);
+    HOP_DOWN: KeyUp(VK_RIGHT);
+  end;
+  t.start();
+  while (averagePixelShift(MSCBox, 100, 300) > 0) do
+    if (t.TimeElapsed > 5000) then
+      exit(false);
+  t.start();
+  while (averagePixelShift(MSCBox, 100, 300) = 0) do
+    if (t.TimeElapsed > 15000) then
+      exit(false);
+  wait(randomrange(75, 175));
+  KeyUp(VK_Control);
+  wait(randomrange(0, 50));
+  KeyUp(VK_SHIFT);
+  result := true;
+end;
