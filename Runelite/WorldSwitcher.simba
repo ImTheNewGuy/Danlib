@@ -21,15 +21,28 @@ begin
   end;
   t.start();
   while (averagePixelShift(MSCBox, 100, 300) > 0) do
-    if (t.TimeElapsed > 5000) then
+  begin
+    if ClickedToContinue then
+    begin
+      wait(randomrange(75, 175));
+      KeyUp(VK_Control);
+      wait(randomrange(75, 175));
+      KeyUp(VK_SHIFT);
+      wait(randomrange(375, 575));
+      TypeSend('2', false);
+    end;
+    if (t.TimeElapsed > 8000) then
       exit(false);
+  end;
   t.start();
   while (averagePixelShift(MSCBox, 100, 300) = 0) do
     if (t.TimeElapsed > 15000) then
       exit(false);
   wait(randomrange(75, 175));
-  KeyUp(VK_Control);
+  if isKeyDown(VK_Control) then
+    KeyUp(VK_Control);
   wait(randomrange(0, 50));
-  KeyUp(VK_SHIFT);
+  if isKeyDown(VK_SHIFT) then
+    KeyUp(VK_SHIFT);
   result := true;
 end;
