@@ -339,3 +339,27 @@ function SecondsToMS(Seconds:integer):integer;
 begin
   result := Seconds*1000;
 end;
+
+procedure ScreenShot(Text:string);
+var
+  Dir, t:string;
+begin
+  Dir := 'C:/Simba/Scripts/Screenshots';
+  if not DirectoryExists(Dir) then
+    createDirectory(Dir);
+  if (length(ScriptName) > 1) then
+  begin
+    Dir := 'C:/Simba/Scripts/Screenshots/'+ScriptName;
+    if not DirectoryExists(Dir) then
+      createDirectory(Dir);
+  end else
+  begin
+    Dir := Dir := 'C:/Simba/Scripts/Screenshots/Misc';
+    if not DirectoryExists(Dir) then
+      createDirectory(Dir);
+  end;
+  t := ExtractFromStr(Text, letters);
+  writeln(Dir+'/[' +theDate(Date_Day)+ ' - ' +theTime(true)+'] Duration - '+msToTime(getTimeRunning(), Time_Short)+' - '+t+'.jpg');
+  SaveScreenShot(Dir+'/[' +theDate(Date_Day)+ ' - ' +theTime(true)+'] Duration - '+msToTime(getTimeRunning(), Time_Short)+' - '+t+'.jpg');
+end;
+  //SaveScreenshot('[' +theDate(DATE_MONTH)+ ' - ' +msToTime(getTimeRunning(), TIME_BARE)+']:Cooker Terminate Screenshot.jpg');

@@ -72,6 +72,18 @@ begin
   result := findColor(x, y, clOutline_black, GetInvBox(i).x1, GetInvBox(i).y1, GetInvBox(i).x2, GetInvBox(i).y2);
 end;
 
+function getUsedSlots:tIntegerArray;
+var
+  i:integer;
+begin
+  for i := 1 to 28 do
+    if ItemInSlot(i) then
+    begin
+      SetArrayLength(result, length(result)+1);
+      result[high(result)] := i;
+    end;
+end;
+
 function interactSlotEx(Slot: Integer; action: Variant; miss: Boolean=False): Boolean;
 begin
   result := false;
@@ -575,7 +587,6 @@ begin
       for i:= low(Items) to high(Items) do
         if Items[i].inSlot(Slot) then
           exit(true);
-    writeln('Confirmed that item in slot', i,' did not match items');
   end;
   result := false;
 end;

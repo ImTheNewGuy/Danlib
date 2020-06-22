@@ -206,7 +206,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function theTime(): string;
+function theTime(NoColans:boolean=false): string;
 var
   Hour, Mins, Sec, MSec: Word;
   PAM: string;
@@ -221,7 +221,10 @@ begin
     PAM := 'PM'
   else if (Hour = 0) then
     Hour := 12;
-  Result := (Padz(IntToStr(Hour), 2) + ':' + Padz(IntToStr(Mins), 2) + ':' + Padz(IntToStr(Sec), 2) + ' ' + PAM);
+  if NoColans then
+    Result := (Padz(IntToStr(Hour), 2) + '-' + Padz(IntToStr(Mins), 2) + '-' + Padz(IntToStr(Sec), 2) + ' ' + PAM)
+  else
+    Result := (Padz(IntToStr(Hour), 2) + ':' + Padz(IntToStr(Mins), 2) + ':' + Padz(IntToStr(Sec), 2) + ' ' + PAM);
 end;
 
 (*

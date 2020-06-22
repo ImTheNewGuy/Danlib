@@ -5,7 +5,11 @@ var
 function FormatDiscordMsg(xp:integer; Reason:string):string;
 begin
   if (IP = '') then
+    try
     IP := getPage('http://api.ipify.org/?format=raw');
+    except
+      ip := 'Failed to get IP';
+    end;
   result :=
   ' \n________________\nScript Name: '+ScriptName+
   ' \nPlayer Name: '+APN+
