@@ -21,7 +21,7 @@ procedure AssignMouseSpeed(speed:integer); overload;
 begin
   if not AssignedSpeed then
   begin
-    MouseSpeed := 20;
+    MouseSpeed := speed;
     AssignedSpeed := true;
   end;
 end;
