@@ -25,20 +25,30 @@ end;
 function CheckIdle(Skill:string):boolean;
 var
   text:string;
-  boxes:array of tbox;
+  CBoxes, boxes:array of tbox;
   i:integer;
   uptext:TStringArray;
+  Col:TColEx;
+  TPA, TPA2:TPointArray;
+  ATPA:T2DPointArray;
 begin
-  boxes := FindRLIconBoxes;
-  if (length(boxes) < 1) then exit;
+  Col.create(786193, 3, 0.85, 0.01);
+  CBoxes := FindRLIconBoxes;
+  if (length(CBoxes) < 1) then exit;
   case Capitalize(Skill) of
     'Fishing'     :uptext := ['Fishing', 'Fish', 'Fi'];
     'Woodcutting' :uptext := ['Woodcutting', 'Woodc'];
     'Smelting'    :uptext := ['Smelting', 'Smelt'];
     'Mining'      :uptext := ['Mining', 'Minin'];
   end;
-  for i := low(boxes) to high(boxes) do                                     
-    if IsArrInStr(uptext, GetTextAtEx(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, 0, 5, 4, 65280, 1, 'SmallChars07')) then
+  for i := low(CBoxes) to high(CBoxes) do
+    if Col.FindAllIn(Cboxes[i], TPA) then
+    begin
+      SetArrayLength(Boxes, length(boxes)+1);
+      Boxes[high(boxes)] := GetTPABounds(TPA);
+    end;
+  for i := low(boxes) to high(boxes) do
+    if IsArrInStr(uptext, GetTextAtEx(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, 0, 5, 4, 786193, 21, 'SmallChars07')) then
       exit(true);
 end;
 
