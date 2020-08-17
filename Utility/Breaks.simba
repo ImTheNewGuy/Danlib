@@ -1,0 +1,74 @@
+type TBreak = record
+  _Initiate:boolean;
+  Break_Duration_min:integer;
+  Break_Duration_Max:integer;
+  Breaking_At:integer;
+  Time_between_breaks_Min:integer;
+  Time_between_breaks_Max:integer;
+end;
+
+var
+  Breaks:TBreak;
+
+function TBreak.IsBreakTime:boolean;
+begin
+  if self._Initiate then
+    result := GetTimeRunning > self.Breaking_At
+  else
+    writeln('Breaks are not initiated!');
+end;
+
+function TBreak.TimeUntilBreak:integer;
+begin
+  if self._Initiate then
+    result := self.Breaking_At - GetTimeRunning
+  else
+    writeln('Breaks are not initiated!');
+end;
+
+function TBreak.HandleBreak:boolean;
+var
+  breakUntil:integer;
+begin
+  if not self._Initiate then exit;
+  if (Self.Breaking_At < 1) then
+    Self.Breaking_At := randomrange(GetTimeRunning + self.Time_between_breaks_Min, GetTimeRunning + self.Time_between_breaks_Max);
+  if not self.IsBreakTime then exit;
+  clearDebug;
+  writeln('[Break System] Starting break...');
+  if IsPlayerLoggedIn then
+    if (random(100) > 25) then
+      LogPlayerOut;
+  BreakUntil := GetTimeRunning + randomrange(Self.Break_Duration_min, Self.Break_Duration_max);
+  While (BreakUntil > GetTimeRunning) do
+  begin
+    wait(1000);
+    ClearDebug;
+    writeln('[Break System] Time left on break: ', MSToTime(BreakUntil - GetTimeRunning, time_Short));
+  end;
+  clearDebug;
+  writeln('[Break System] Break finished. Logging in...');
+  if not IsPlayerLoggedIn then
+  begin
+    if ((length(Me.name) < 1) or (length(me.pass) < 1)) then
+    begin
+      writeln('Username and/or password are not declared!');
+      terminateScript;
+    end;
+    LogPlayerIn;
+    if not waitFunc(@IsPlayerLoggedIn, 200, 10000) then
+    begin
+      writeln('Player not logged in 10 seconds after attempt');
+      TerminateScript;
+    end;
+  end;
+  self.Breaking_At := randomrange(self.Time_between_breaks_Min, self.Time_between_breaks_Max);
+  result := true;
+end;
+
+procedure TBreak.Setup;
+begin
+  self.Breaking_At := randomrange(self.Time_between_breaks_Min, self.Time_between_breaks_Max);
+  self._Initiate := true;
+end;
+

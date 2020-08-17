@@ -15,7 +15,7 @@ var
 begin
   x := round(GetMMBox.x2 - ((GetMMBox.x2-GetMMBox.x1)/2));
   y := round(GetMMBox.y2 - ((GetMMBox.y2-GetMMBox.y1)/2));
-  result := point(x, y);
+  result := point(x, y+1);
 end;
 
 const

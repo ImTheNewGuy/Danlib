@@ -39,7 +39,7 @@ Const
   {$include_once Player/WorldHandler.simba}
   {$include_once Utility/OSBuddyAPI.simba}
   {$include_once Antiban/Antiban.simba}
-
+  {$include_once Utility/Breaks.simba}
 
 
 
