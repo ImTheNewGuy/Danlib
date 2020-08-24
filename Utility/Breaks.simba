@@ -8,7 +8,7 @@ type TBreak = record
 end;
 
 var
-  Breaks:TBreak;
+  _Breaks:TBreak;
 
 function TBreak.IsBreakTime:boolean;
 begin
