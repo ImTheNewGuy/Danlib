@@ -135,7 +135,8 @@ begin
       exit(true);
 end;
 
-function chooseOptionMulti(Texts: TStringArray): Boolean;
+// Original choose option. Has a chance to miss the target option. Fails a lot.
+function chooseOptionMultiEx(Texts: TStringArray): Boolean;
 var
   B,B2    : TBox;
   Pnt     : TPoint;
@@ -186,7 +187,8 @@ begin
           fastClick(MOUSE_LEFT);
 
         exit(True);
-      end;
+      end else
+        writeln('Arr not in str in ', Options[i]);
     end;
   except
     writeln('Error in chooseOptionMulti');
@@ -195,9 +197,48 @@ begin
   exitMenu;
 end;
 
+// Added to fix the above function.
+function chooseOptionMulti(Texts: TStringArray; ClickDelayFrom:integer = 75; ClickDelayTo:integer = 275): Boolean;
+var
+  B    : TBox;
+  i,R,x2,y2,Attempts: Integer;
+  Options : Array of TOptions;
+begin
+  if (Attempts < 3) then
+  begin
+    inc(Attempts);
+    Options := getOptions();
+    if (length(Options) < 1) then
+      exit(False);
+    for i:=0 to high(Options) do
+    begin
+      if arrInStr(Texts, Options[i].Str) then
+      begin
+        B := Options[i].Bounds;
+        getMousePos(x2, y2);
+        R := min(((B.X2 - B.X1) shr 1), 5);
+        wait(randomrange(ClickDelayFrom, ClickDelayTo));
+        if not pointInBox(Point(x2,y2), B) then
+          mouseBox(B.x1+R, B.Y1, B.x2-R, B.Y1+5, R, MOUSE_LEFT)
+        else
+          FastClick(MOUSE_LEFT);
+        exit(true);
+      end else
+        writeln('Arr not in str ', Options[i]);
+    end;
+    writeln('No options matched.');
+  end;
+end;
+
+
 function chooseOption(Txt: String): Boolean;
 begin
   Result := chooseOptionMulti([Txt]);
+end;
+
+function chooseOptionEx(Txt: String): Boolean;
+begin
+  Result := chooseOptionMultiEx([Txt]);
 end;
 
 function waitOptionExistsMulti(S: TStringArray; Time: Integer): Boolean;

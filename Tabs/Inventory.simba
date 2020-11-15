@@ -733,3 +733,8 @@ begin
       end;
   until(length(result) = length(IntArray));
 end;
+
+procedure DItem.Free;
+begin
+  FreeDTM(Self.DTM);
+end;

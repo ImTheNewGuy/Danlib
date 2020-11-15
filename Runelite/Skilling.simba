@@ -31,6 +31,7 @@ var
   Col:TColEx;
   TPA, TPA2:TPointArray;
   ATPA:T2DPointArray;
+  s:string;
 begin
   Col.create(786193, 3, 0.85, 0.01);
   CBoxes := FindRLIconBoxes;
@@ -40,6 +41,7 @@ begin
     'Woodcutting' :uptext := ['Woodcutting', 'Woodc'];
     'Smelting'    :uptext := ['Smelting', 'Smelt'];
     'Mining'      :uptext := ['Mining', 'Minin'];
+    'Cooking'     :uptext := ['Cooking', 'Cook'];
   end;
   for i := low(CBoxes) to high(CBoxes) do
     if Col.FindAllIn(Cboxes[i], TPA) then
@@ -48,8 +50,12 @@ begin
       Boxes[high(boxes)] := GetTPABounds(TPA);
     end;
   for i := low(boxes) to high(boxes) do
-    if IsArrInStr(uptext, GetTextAtEx(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, 0, 5, 4, 786193, 21, 'SmallChars07')) then
+  begin
+    s := GetTextAtEx(boxes[i].x1, boxes[i].y1, boxes[i].x2, boxes[i].y2, 0, 5, 4, 786193, 21, 'SmallChars07');
+    writeln(s);
+    if IsArrInStr(uptext, s) then
       exit(true);
+  end;
 end;
 
 function IsFishing:boolean;
@@ -70,6 +76,11 @@ end;
 function IsMining:boolean;
 begin
   result := CheckIdle('Mining');
+end;
+
+function IsCooking:boolean;
+begin
+  result := CheckIdle('Cooking');
 end;
 
 // Requires Tile location to be enabled in developer tools. Reads the text that appears near curser when selecting a tile.
