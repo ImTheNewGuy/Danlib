@@ -47,20 +47,13 @@ begin
   result := ToBox((w-196), (h-145), (w-47), (h-102));
 end;
 
-function IsAutoRetaliateEnabled(ChangeTabBack:boolean=true): boolean;
+function IsAutoRetaliateEnabled: boolean;
 var
   ARCol:TColEx;
-  LastTab:string;
 begin
-  LastTab := GetActiveTab;
   ChangeTab('Combat');
   ARCol.Create(1908610, 8, 0.02, 0.10);
   result := ARCol.FindIn(getAutoRetaliateBox);
-  if ChangeTabBack then
-  begin
-    wait(randomrange(175, 575));
-    ChangeTab(LastTab);
-  end;
 end;
 
 //enableAR = enable or disable auto retaliate (true/false)
