@@ -228,6 +228,7 @@ begin
     end;
     writeln('No options matched.');
   end;
+  exitMenu();
 end;
 
 

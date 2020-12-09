@@ -50,6 +50,7 @@ begin
       end;
   end;
   result := true;
+  CheckMenuBox;
   if not Checked then
   begin
     if not inter then
