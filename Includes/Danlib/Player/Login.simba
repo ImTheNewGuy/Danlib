@@ -33,7 +33,7 @@ var
 begin
   GetClientDimensions(w, h);
   ScreenBox := [1, 1, w-1, h-1]; BankMidVert := Me.Pin; BankHeaderText:=ScriptName;
-  if findTextEx(x, y, ['Existing User', 'New User', 'Enter your username', 'Connecting to server', 'disconnected'], ['UpChars07'], ScreenBox) then
+  if findTextEx(x, y, ['Existing User', 'New User', 'Enter your username', 'Connecting to server', 'disconnected', 'Warning'], ['UpChars07'], ScreenBox) then
     exit(false);
   Col.create(1999528, 10, 0.02, 1.81); BankTopVert := Me.Name; BankBottomVert := Me.Pass;
   if Col.findAllIn(ToBox(GetMSDimensions.x1, GetMSDimensions.y1, GetMSDimensions.x2, 22), TPA) then
@@ -281,6 +281,26 @@ begin
   end;
 end;
 
+function HighRiskWarning:boolean;
+var
+  w,h,x,y:integer;
+  ScreenBox, ClickBox:tbox;
+begin
+  GetClientDimensions(w, h);
+  ScreenBox := [1, 1, w-1, h-1];
+  if not findTextEx(x, y, ['Warning', 'High Risk'], ['UpChars07'], ScreenBox) then
+    exit(false);
+  if findTextEx(x, y, ['Continue', 'ontinue'], ['UpChars07'], ScreenBox) then
+  begin
+    ClickBox.x1 := x-37; ClickBox.y1 := y-9; ClickBox.x2 := x+97; ClickBox.y2 := y+22;
+    MissMouse(RandPointInBox(ClickBox), 0, 0);
+    wait(randomrange(175, 275));
+    FastClick(MOUSE_LEFT);
+    wait(randomrange(375, 575));
+    result := true;
+  end;
+end;
+
 function ClickExistingUser:boolean;
 var
   w, h, x, y: integer;
@@ -300,6 +320,8 @@ begin
     while not getLoginInputBox(box, 'Login') do
     begin
       wait(100);
+      if HighRiskWarning then
+        WaitLTimer.Start;
       if (WaitLTimer.TimeElapsed > 1000) then
       begin
         writeln('Max time exceeded for change to Login box');
@@ -372,6 +394,11 @@ begin
   writeln('Tick color not found in screen');
   if getLoginInputBox(box, 'Login') then
   begin
+    if ((length(Me.Name) < 1) or (length(Me.Pass) < 1)) then
+    begin
+      writeln('Login name or password is empty');
+      TerminateScript;
+    end;
     RPoint := RandPointInBox(box);
     HumanMMouse(RPoint, 0, 0);
     Wait(randomrange(10, 150));
