@@ -1,4 +1,4 @@
-function arrInStr(arrS: TStringArray; str: string): Boolean;
+function arrInStr(arrS: TStringArray; str: string; CaseSensitive:boolean=true): Boolean;
 var
   I, L, H: Integer;
 begin
@@ -6,7 +6,11 @@ begin
   L := Low(arrS);    H := High(arrS);
   for I := L to H do
     if Pos(arrS[I], Str) > 0 then
-      Exit(True);
+      exit(true)
+    else
+      if not CaseSensitive then
+        if Pos(LowerCase(arrS[I]), LowerCase(Str)) > 0 then
+          exit(true);
 end;
 
 (*
@@ -60,7 +64,7 @@ Example:
 .. code-block:: pascal
 
 *)
-function strInArr(str: string; arrS: TStringArray): Boolean;
+function strInArr(str: string; arrS: TStringArray; CaseSensitive:boolean=true): Boolean;
 var
   I, L, H: Integer;
 begin
@@ -68,7 +72,11 @@ begin
   L := Low(arrS);    H := High(arrS);
   for I := L to H do
     if Pos(Str, arrS[I]) > 0 then
-      Exit(True);
+      Exit(True)
+    else
+      if not CaseSensitive then
+        if Pos(LowerCase(Str), LowerCase(arrS[I])) > 0 then
+          exit(true);
 end;
 
 Function toBox(Xs, Ys, Xe, Ye: Integer): TBox;
