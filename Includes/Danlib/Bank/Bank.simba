@@ -190,7 +190,7 @@ begin
     exit(true)
   else
   begin
-    MouseBox2(GetBankTabBox(TabNum), MOUSE_LEFT);
+    MouseBox(GetBankTabBox(TabNum), MOUSE_LEFT, true);
     ChangeTimer.start();
     while not IsBankTabActive(TabNum) do
     begin

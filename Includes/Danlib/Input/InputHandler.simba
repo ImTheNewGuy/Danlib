@@ -763,14 +763,17 @@ begin
   fastClick(ClickType);
 end;
 
-Procedure mouseBox2(B: TBox; ClickType: Integer); overload;
+Procedure mouseBox(B: TBox; ClickType: Integer; Miss:boolean); overload;
 var
   Pnt : TPoint;
 begin
   AssignMouseSpeed;
   getMousePos(Pnt.x,Pnt.y);
   pnt := randPointInBox(b);
-  missMouse(Pnt, 0, 0);
+  if Miss then
+    missMouse(Pnt, 0, 0)
+  else
+    HumanMMouse(Pnt, 0, 0);
   wait(randomRange(35,85));
   fastClick(ClickType);
 end;

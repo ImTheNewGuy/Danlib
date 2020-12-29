@@ -1,5 +1,5 @@
 const
-  Danlib_Version = '1.4.1';
+  Danlib_Version = '1.4.2';
 
 const
   Red     = 'Red';

@@ -1,0 +1,6 @@
+program new;
+{$i Danlib/Danlib.Simba}
+begin
+  ClearDebug;
+  writeln('Username reads as: ', GetChatBoxTextEx(9, 0));
+end.

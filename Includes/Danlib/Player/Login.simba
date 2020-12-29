@@ -49,6 +49,8 @@ begin
         exit(false);
       end;
   end;
+  if isSplashScreenVisible then
+    exit(false);
   result := true;
   CheckMenuBox;
   if not Checked then
@@ -426,6 +428,9 @@ begin
         writeln('Invalid username or password.');
         exit(false);
       end;
+      if IsPlayerLoggedIn then
+        if not isSplashScreenVisible then
+          exit(true);
     end;
     if IsSplashScreenVisible then
       if not ClickSplashScreen then
@@ -458,7 +463,7 @@ begin
     if LogOutCol.FindIn(MD) then
     begin
       wait(randomrange(50, 600));
-      MouseBox2(MD, MOUSE_LEFT);
+      MouseBox(MD, MOUSE_LEFT, true);
       LOTimer.Start;
       while isPlayerLoggedIn do
       begin
@@ -476,7 +481,7 @@ begin
       if DoorCol.FindIn(MD) then
       begin
         wait(randomrange(50, 600));
-        MouseBox2(MD, MOUSE_LEFT);
+        MouseBox(MD, MOUSE_LEFT, true);
         LOTimer.Start;
         while isPlayerLoggedIn do
         begin

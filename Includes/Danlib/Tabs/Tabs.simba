@@ -110,7 +110,7 @@ begin
   begin
     TempBox:= GetMenuBox(tab);
     if miss then
-      MouseBox2(TempBox, MOUSE_LEFT)
+      MouseBox(TempBox, MOUSE_LEFT, true)
     else
       Mousebox(TempBox, MOUSE_LEFT);
     if dowait then
