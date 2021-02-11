@@ -74,13 +74,20 @@ type TPlayer = record
   Arrays    : array of TVariantArray;
 end;
 
+type InvObject = record
+  Outline_Count:integer;
+  Inside_Cols:array of TColEx;
+end;
+
 type DItem = record
   Name      : string;
   DTM       : integer;
   BMP       : integer;
   BMP_TOL   : integer;
+  Col       : InvOBject;
   Wieldable : boolean;
   UpText    : TStringArray;
+  BankBox   : tbox;
 end;
 
 Type

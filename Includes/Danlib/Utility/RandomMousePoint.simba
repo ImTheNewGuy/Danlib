@@ -1,0 +1,96 @@
+type TRandomMousePoint = record
+  MidPoint:Tpoint;
+  MaxRadDist, BaseDist:Integer;
+  RefPoints, RefPoints_Distance:TPointArray;
+  Bounds:Tbox;
+end;
+
+var
+  RandomPoint:TRandomMousePoint;
+
+function TRandomMousePoint.RandPosition(Mu, Sigma, min, max:Double): Integer;
+var
+  t, g:Double;
+begin
+  t := 2 * PI * Random();
+  g := mu + (sigma * Sqrt(-2 * Ln(Random()))) * Cos(t);
+  if (g<min) then
+    g := min;
+  if (g > max) then
+    g := max;
+  Result := Round(g);
+end;
+
+function TRandomMousePoint.CalculatePoint(Pnt:TPoint; MaxRadDist:Integer; BaseDist:Integer=4):TPoint;
+begin
+  result.x := RandPosition(Pnt.x, BaseDist, Pnt.x-MaxRadDist, Pnt.x+MaxRadDist);
+  result.y := RandPosition(Pnt.y, BaseDist, Pnt.y-MaxRadDist, Pnt.y+MaxRadDist);
+end;
+
+function TRandomMousePoint.GetPoint:TPoint;
+var
+  Option:integer;
+begin
+  Option := randomrange(1, 10000);
+  repeat
+    case Option of
+      1..2000     : Result := Self.CalculatePoint(Self.RefPoints[0], Self.MaxRadDist, Self.BaseDist);
+      2001..5000  : Result := Self.CalculatePoint(Self.RefPoints[1], Self.MaxRadDist, Self.BaseDist);
+      5001..10000 : Result := Self.CalculatePoint(Self.MidPoint, Self.MaxRadDist, Self.BaseDist);
+    end;
+    if (Self.Bounds.x1 < 1) then
+      break;
+  until(PointInBox(Result, Self.Bounds));
+end;
+
+procedure TRandomMousePoint.ChangeMidPoint(p:Tpoint);
+var
+  i:integer;
+begin
+  if not (Length(Self.RefPoints) = 2) then exit;
+  Self.MidPoint := p;
+  Self.RefPoints[0].x := Self.MidPoint.x - Self.RefPoints_Distance[0].x;
+  Self.RefPoints[0].y := Self.MidPoint.y - Self.RefPoints_Distance[0].y;
+  Self.RefPoints[1].x := Self.MidPoint.x - Self.RefPoints_Distance[1].x;
+  Self.RefPoints[1].y := Self.MidPoint.y - Self.RefPoints_Distance[1].y;
+end;
+
+procedure TRandomMousePoint.Setup(MidPoint:TPoint; MaxRadDist, RefPointsMaxDistFromMid:integer; BaseDist:integer=12; Bounds:Tbox=[0,0,0,0]; DebugRefPoints:boolean=false);
+var
+  i:integer;
+begin
+  Self.MidPoint := MidPoint;
+  Self.MaxRadDist := MaxRadDist;
+  Self.Bounds := Bounds;
+  Self.BaseDist := BaseDist;
+  if (length(Self.RefPoints) < 1) then
+  begin
+    for i := 0 to 1 do
+    begin
+      Self.RefPoints.Append(Self.CalculatePoint(MidPoint, RefPointsMaxDistFromMid, RefPointsMaxDistFromMid));
+      SetArrayLength(Self.RefPoints_Distance, length(Self.RefPoints_Distance) + 1);
+      Self.RefPoints_Distance[i].x := Self.MidPoint.x - Self.RefPoints[i].x;
+      Self.RefPoints_Distance[i].y := Self.MidPoint.y - Self.RefPoints[i].y;
+    end;
+  end;
+  if DebugRefPoints then
+    writeln('Reference points: ', Self.RefPoints);
+end;
+
+function TRandomMousePoint.PointInBox(b:tbox; Dynamic_RefPoints:boolean=true):tpoint;
+var
+  d:integer;
+begin
+  if Dynamic_RefPoints then
+    if (length(Self.RefPoints) = 2) then
+    begin
+      Self.ChangeMidPoint(b.mid);
+      Self.Bounds := b;
+    end;
+  if not (length(Self.RefPoints) = 2) then
+  begin
+    d := Distance(b.Mid.x, b.Mid.y, b.x2, b.y2);
+    Self.Setup(b.Mid, d, round(d/2), round(d/4), b, false);
+  end;
+  result := Self.GetPoint;
+end;

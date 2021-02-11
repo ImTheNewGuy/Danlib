@@ -1,13 +1,16 @@
 var
   iBox:tbox;
+  ItemPoint:TRandomMousePoint;
 
-function GetInvBox(InvNum:integer): TBox;
+function GetInvBox(InvNum:integer; Expand:integer=0): TBox;
 var
   TempBox:Tbox;
+
+
 begin
   TempBox := GetMenuBox('Inv');
   case InvNum of
-    1: Result := ToBox((TempBox.X1-63), (TempBox.Y2+10), (TempBox.X1-32), (TempBox.Y2+41));
+    1: Result := ExpandBox(ToBox((TempBox.X1-63), (TempBox.Y2+10), (TempBox.X1-32), (TempBox.Y2+41)), Expand);
     2: Result := ToBox((TempBox.X1-21), (TempBox.Y2+10), (TempBox.X1+10), (TempBox.Y2+41));
     3: Result := ToBox((TempBox.X1+21), (TempBox.Y2+10), (TempBox.X1+52), (TempBox.Y2+41));
     4: Result := ToBox((TempBox.X1+63), (TempBox.Y2+10), (TempBox.X1+94), (TempBox.Y2+41));
@@ -52,6 +55,18 @@ begin
     result := iBox;
 end;
 
+function PointToSlot(p:tpoint):integer;
+var
+  i:integer;
+begin
+  if not PointInBox(p, GetInventoryDimensions) then
+    exit;
+  for i := 1 to 28 do
+    if PointInBox(p, GetInvBox(i)) then
+      exit(i);
+end;
+
+
 function itemInSlotEx(I: Integer): Boolean;
 var
   X, Y: Integer;
@@ -93,9 +108,9 @@ begin
 
   if (not mouseInBox(GetInvBox(Slot))) then
     if miss then
-      MissMouse(RandPointInBox(GetInvBox(slot)), 0, 0)
+      MissMouse(ItemPoint.PointInBox(GetInvBox(slot)), 0, 0)
     else
-      HumanMMouse(RandPointInBox(GetInvBox(slot)), 0, 0);
+      HumanMMouse(ItemPoint.PointInBox(GetInvBox(slot)), 0, 0);
 
   if variantIsInteger(action) then
   begin
@@ -127,7 +142,7 @@ begin
 
   if (not mouseInBox(GetInvBox(Slot))) then
   begin
-    rpoint := RandPointInBox(GetInvBox(Slot));
+    rpoint := ItemPoint.PointInBox(GetInvBox(Slot));
     getMousepos(x, y);
     PosDist := distance(x, y, rpoint.x, rpoint.y);
     if (PosDist > Dist) then
@@ -217,7 +232,7 @@ begin
   fPnt := point(x, y);
 end;}
 
-function DItem.findIn(Area: TBox; var fPnt: TPoint): Boolean;
+{function DItem.findIn(Area: TBox; var fPnt: TPoint): Boolean;
 var
   x,y, ExCount : Integer;
 begin
@@ -239,6 +254,61 @@ begin
   if not result then
     exit(false);
   fPnt := point(x, y);
+end;}
+
+function InvObject.FindIn(Area:tbox; var p:tpoint):boolean;
+var
+  BlackCol:TColEx;
+  i, a:integer;
+  TPA:TPointArray;
+  ATPA:T2DPointArray;
+begin
+  BlackCol.create(65536, 0);
+  if BlackCol.findAllIn(Area, TPA) then
+  begin
+    ATPA := ClusterTPAEx(TPA, 1, 1);
+    for i := low(ATPA) to high(ATPA) do
+      if (BlackCol.count(ExpandBox(GetTPABounds(ATPA[i]), 1)) = Self.Outline_Count) then
+        if (length(Self.Inside_Cols) < 1) then
+          exit(true)
+        else
+          for a := low(Self.Inside_Cols) to high(Self.Inside_Cols) do
+          begin
+            if not Inside_Cols[a].findIn(GetTPABounds(ATPA[i])) then
+              break;
+            if a = high(Self.Inside_Cols) then
+            begin
+              p := MiddleTPA(ATPA[i]);
+              exit(true);
+            end;
+          end;
+  end;
+end;
+
+procedure InvObject.Create(Outline_Count:integer; Cols:array of TColEx);
+begin
+  Self.Outline_Count := Outline_Count;
+  Self.Inside_Cols := Cols;
+end;
+
+function DItem.findIn(Area: TBox; var fPnt: TPoint): Boolean;
+var
+  x,y:integer;
+begin
+  if DTMExists(Self.DTM) then
+  begin
+    result := findDTM(self.DTM, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2);
+    fPnt := point(x, y);
+  end else
+    if bitmapExists(self.BMP) then
+    begin
+      result := findBitmapToleranceIn(self.BMP, x, y, Area.X1, Area.Y1, Area.X2, Area.Y2, self.BMP_TOL);
+      fPnt := point(x, y);
+    end else
+      if (Self.Col.Outline_Count > 0) then
+        result := Self.Col.FindIn(Area, fPnt)
+      else
+        writeln(Self.Name, ': No DTM, bitmap or colour loaded');
 end;
 
 {function DItem.findIn(Area: TBox): Boolean; Overload;
@@ -258,7 +328,15 @@ begin
   end;
 end;   }
 
-function DItem.findIn(Area: TBox): Boolean; Overload;
+function DItem.FindIn(Area:TBox):boolean;Overload;
+var
+  x, y:integer;
+  p:tpoint;
+begin
+  result := Self.FindIn(Area, p);
+end;
+
+{function DItem.findIn(Area: TBox): Boolean; Overload;
 var
   x,y, ExCount: Integer;
 begin
@@ -279,7 +357,7 @@ begin
   end;
   if not result then
     exit(false);
-end;
+end;}
 
 function DItem.inEquipment(): Boolean;
 var
@@ -289,9 +367,8 @@ begin
   ChangeTab('Equip');
   if DTMExists(self.DTM) then
     result := findDTM(self.DTM, x, y, GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2);
-  if not result then
-    if bitmapExists(self.BMP) then
-      result := findBitmapToleranceIn(self.BMP, x, y, GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2, self.BMP_TOL);
+  if bitmapExists(self.BMP) then
+    result := findBitmapToleranceIn(self.BMP, x, y, GetInvBox(1).X1, GetInvBox(1).Y1, GetInvBox(28).X2, GetInvBox(28).Y2, self.BMP_TOL);
 end;
 
 function DItem.inInventory(): Boolean;
@@ -350,13 +427,25 @@ begin
   result := GetInvBox(slots[0]);
 end;
 
-function DItem.RandPoint():tpoint;
+function DItem.RandPoint(InBank:boolean=false):tpoint;
 var
   slots : TIntegerArray;
+  b:tbox;
 begin
-  slots  := Self.getSlots();
-  if length(slots) < 1 then Exit;
-  result := RandPointInBox(GetInvBox(slots[0]));
+  if not InBank then
+  begin
+    slots  := Self.getSlots();
+    if length(slots) < 1 then Exit;
+    result := ItemPoint.PointInBox(GetInvBox(slots[0]));
+  end else
+  begin
+    if not IsBankOpen then
+      exit(Point(-1, -1));
+    b:= Self.GetBankBox;
+    if (b.x1 < 1) then
+      exit(Point(-1, -1));
+    result := ItemPoint.PointInBox(b);
+  end;
 end;
 
 function DItem.getRandomSlot(): Integer;
@@ -474,9 +563,9 @@ begin
     if self.findIn(GetInvBox(DropArr[i])) then
     begin
       if miss then
-        MissMouse(randPointInBox(GetInvBox(DropArr[i])), 0, 0)
+        MissMouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0)
       else
-        HumanMMouse(randPointInBox(GetInvBox(DropArr[i])), 0, 0);
+        HumanMMouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0);
       if not isKeyDown(VK_SHIFT) then
       begin
         keyDown(VK_SHIFT);
@@ -605,6 +694,15 @@ begin
     end;
 end;
 
+function DItem.InArray(Items:DItemArray):boolean;
+var
+  i:integer;
+begin
+  for i := low(Items) to high(Items) do
+    if (Self = Items[i]) then
+      exit(true);
+end;
+
 function FastDropItems(Items:array of DItem; Miss:boolean=true):boolean;
 var
   i,a:integer;
@@ -627,9 +725,9 @@ begin
           keyDown(VK_SHIFT);
         if not MouseInBox(GetInvBox(DropArr[i])) then
           if Miss then
-            MissMouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0)
+            MissMouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0)
           else
-            HumanMmouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0);
+            HumanMmouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0);
         FastClick(MOUSE_LEFT);
         wait(randomrange(5, 75));
         if FCol.FindIn(GetInvBox(DropArr[i])) then
@@ -668,9 +766,9 @@ begin
       keyDown(VK_SHIFT);
     if not MouseInBox(GetInvBox(DropArr[i])) then
       if Miss then
-        MissMouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0)
+        MissMouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0)
           else
-        HumanMmouse(RandPointInBox(GetInvBox(DropArr[i])), 0, 0);
+        HumanMmouse(ItemPoint.PointInBox(GetInvBox(DropArr[i])), 0, 0);
     FastClick(MOUSE_LEFT);
     if FirstInteract then
     begin
@@ -736,5 +834,8 @@ end;
 
 procedure DItem.Free;
 begin
-  FreeDTM(Self.DTM);
+  if DTMExists(Self.DTM) then
+    FreeDTM(Self.DTM);
+  if BitmapExists(Self.BMP) then
+    FreeBitmap(Self.BMP);
 end;

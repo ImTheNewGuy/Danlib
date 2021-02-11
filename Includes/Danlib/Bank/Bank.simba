@@ -3,6 +3,8 @@ const
 var
   BBox, BTBox, TSBox, DIBox, SwapBox, InsBox, ItemButBox, NoteBox, PHBox, searchButbox, DEBox, WithdrawXBox, WithdrawAllBox: TBox;
   FoundBoxes: boolean;
+  BankSquares:TBoxArray;
+  BankButtonPoint:TRandomMousePoint;
 
 
 function GetBankScreenBox(var BankBox:TBox; TabbedBanking:boolean):boolean;
@@ -53,7 +55,13 @@ begin
   end;
 end;
 
-function IsBankOpenEx:boolean;
+function BankBox(Tabbed:boolean=true):tbox;
+begin
+  GetBankScreenBox(result, Tabbed);
+end;
+
+
+function IsBankOpen:boolean;
 var
   TB:Tbox;
   x, y: integer;
@@ -70,6 +78,11 @@ begin
         TSBox := ToBox((TB.X1-1), (TB.Y1-1), (TB.X2+200), (TB.Y2+17));
       exit(true);
     end;
+end;
+
+function IsBankOpenEx:boolean;
+begin
+  result := IsBankOpen;
 end;
 
 function GetBankBox(tabbed:boolean = true):tbox;
@@ -118,7 +131,7 @@ end;
 function DepositAll:boolean;
 begin
   if not IsBankOpenEx then exit;
-  MissMouse(RandPointInBox(GetBankButton(BANK_DepositInv)), 0, 0);
+  MissMouse(BankButtonPoint.PointInBox(GetBankButton(BANK_DepositInv)), 0, 0);
   wait(randomrange(75, 175));
   FastClick(MOUSE_LEFT);
 end;
@@ -227,6 +240,60 @@ begin
       exit(false);
   end;
   Result := true;
+end;
+
+function GetBankSquares:Array of Tbox;
+var
+  i,x1, y1, x2, y2, Count:integer;
+  b, bb, FirstBox:tbox;
+begin
+  if (length(BankSquares) > 8) then
+    exit(BankSquares);
+  bb := BankBox;
+  for i := 0 to 135 do
+  begin
+    if (Count = 8) then
+    begin
+      Count := 0;
+      y1 := y2+5;
+      y2 := y1+31;
+      x1 := bb.x1 + 3;
+      x2 := bb.x1 + 38;
+      if (y2 > bb.y2) then
+        exit(result);
+    end;
+    if (i = 0) then
+    begin
+      if (FirstBox.x1 < 1) then
+      begin
+        x1 := bb.x1 + 51;
+        y1 := bb.y1 + 3;
+        x2 := bb.x1 + 86;
+        y2 := bb.y1 + 34;
+        FirstBox := ToBox(x1, y1, x2, y2);
+        result += FirstBox;
+      end;
+    end else
+    begin
+      x1 := x2+13;
+      x2 := x1+35;
+      result += ToBox(x1, y1, x2, y2);
+    end;
+    inc(Count);
+  end;
+  BankSquares := result;
+end;
+
+function DItem.GetBankBox:tbox;
+var
+  i:integer;
+  bArray:tboxArray;
+begin
+  bArray := GetBankSquares;
+  for i := low(bArray) to high(bArray) do
+    if Self.findIn(bArray[i]) then
+      exit(bArray[i]);
+  result := [-1, -1, -1, -1];
 end;
 
 function isBankButtonSelected(Button:string):boolean;

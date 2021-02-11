@@ -5,11 +5,13 @@ Const
   {$include_once Globals.simba}
   {$include_once UserSettings.simba}
   {$include_once Definitions.simba}
+  {$include_once Utility/Arrays.simba}
   {$include_once Auth.simba}
   {$include_once Text/Text.simba}
   {$include_once Time/Time.simba}
   {$include_once Utility/Math.simba}
   {$include_once Utility/Utility.simba}
+  {$include_once Utility/RandomMousePoint.simba}
 
   {$include_once Utility/AL_Functions.simba}
   {$include_once Utility/Animation.simba}
@@ -40,6 +42,7 @@ Const
   {$include_once Utility/OSBuddyAPI.simba}
   {$include_once Antiban/Antiban.simba}
   {$include_once Utility/Breaks.simba}
+  {$include_once Utility/Terminate.simba}
 
 
 

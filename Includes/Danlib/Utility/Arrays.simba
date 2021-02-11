@@ -1,0 +1,46 @@
+procedure TPointArray.Append(const Value: TPoint);
+var top:Int32;
+begin
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
+end;
+
+function TPointArray.MidPoint:tpoint;
+begin
+  result := MiddleTPA(self);
+end;
+
+function TBox.Mid:tpoint;
+begin
+  result := MiddleBox(self);
+end;
+
+procedure TIntegerArray.Append(const Value: integer);
+var top:Int32;
+begin
+  top := Length(Self);
+  SetLength(self, top+1);
+  Self[top] := Value;
+end;
+
+function Integer.InArray(IntArr:TIntegerArray):boolean;
+var
+  i:integer;
+begin
+  for i := low(IntArr) to high(IntArr) do
+    if (self = IntArr[i]) then
+      exit(true);
+end;
+
+function TIntegerArray.randomize:TIntegerArray;
+var
+  i:integer;
+begin
+  while not (length(result) = length(self)) do
+  begin
+    i := random(length(self));
+    if not self[i].InArray(result) then
+      result.Append(self[i]);
+  end;
+end;

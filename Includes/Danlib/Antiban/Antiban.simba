@@ -1,4 +1,4 @@
-procedure hoverSkillEx(Skill: Variant; Click: Boolean);
+procedure hoverSkillEx(Skill: Variant; Click: Boolean=false; TabBack:boolean=true);
 var
   TP       : TPoint;
   TheSkill : String;
@@ -32,7 +32,8 @@ begin
     brakeMMouse(TP, 5, 5, True);
     Wait(1000+Random(800));
   end;
-  ChangeTab(tempTab);
+  if TabBack then
+    ChangeTab(tempTab);
 end;
 
 procedure hoverSkillsEx(Skills: TVariantArray);

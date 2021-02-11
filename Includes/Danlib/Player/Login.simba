@@ -19,8 +19,8 @@ begin
       exit(true)
     else
       writeln('Found splash screen cols, but could not find text');
-  end
-    writeln('Could not find splash screen colors');
+  end;
+    //writeln('Could not find splash screen colors');
 end;
 
 function isPlayerLoggedIn:boolean;
@@ -49,8 +49,6 @@ begin
         exit(false);
       end;
   end;
-  if isSplashScreenVisible then
-    exit(false);
   result := true;
   CheckMenuBox;
   if not Checked then
@@ -65,6 +63,16 @@ begin
     if (length(BankMidVert) > 0) then
       cc := BankMidVert;
     ChangeAngle;
+  end;
+end;
+
+function IsPlayerLoggedIn(Check_Splash_Screen:boolean):boolean; overload;
+begin
+  if IsPlayerLoggedIn then
+  begin
+    if not Check_Splash_Screen then exit(true);
+    if not isSplashScreenVisible then
+      exit(true);
   end;
 end;
 

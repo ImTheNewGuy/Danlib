@@ -1,5 +1,5 @@
 const
-  Danlib_Version = '1.4.2';
+  Danlib_Version = '1.4.3';
 
 const
   Red     = 'Red';
@@ -105,7 +105,7 @@ begin
   if (MSBox.x2 > 0) then
     exit(MSBox);
   GetClientDimensions(w, h);
-  Result := [0, 0, w, h];
+  Result := [1, 1, w-1, h-1];
   if Result.X2 > 0 then
     MSBox := Result;
 end;

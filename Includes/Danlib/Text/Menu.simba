@@ -110,7 +110,6 @@ var
 begin
   result  := False;
   Options := getOptions();
-  writeln('Options: ', Options);
   if (length(Options) < 1) then
     exit(False);
 
@@ -224,7 +223,6 @@ begin
           FastClick(MOUSE_LEFT);
         exit(true);
       end else
-        writeln('Arr not in str ', Options[i]);
     end;
     writeln('No options matched.');
   end;

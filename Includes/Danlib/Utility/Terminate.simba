@@ -1,0 +1,13 @@
+var
+  Starting_xp:integer;
+  Terminate_Script_Fired:boolean;
+
+procedure Terminate_Script(TReason:string; Take_Screen_Shot:boolean=false);
+begin
+  SendDiscordWebhook(FormatDiscordMsg(getXPBarAmountEx - Starting_xp, TReason));
+  writeln(MSToTime(GetTimeRunning, TIME_FORMAL),' - Terminated Script: ' +TReason);
+  if Take_Screen_Shot then
+    ScreenShot(TReason);
+  Terminate_Script_Fired := true;
+  TerminateScript;
+end;
